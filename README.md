@@ -10,6 +10,7 @@ Marketing landing site for **Insightis**, an AI analytics workspace that connect
 | Page | File |
 |---|---|
 | Landing | `index.html` |
+| Pricing | `Pricing.html` |
 
 ### Platform
 | Page | File |
@@ -30,6 +31,29 @@ Marketing landing site for **Insightis**, an AI analytics workspace that connect
 | Product Teams | `Solutions/Product Teams.html` |
 | Data & Analytics Teams | `Solutions/Data Analytics Teams.html` |
 | Operations & Finance | `Solutions/Operations Finance.html` |
+
+### Resources
+| Page | File |
+|---|---|
+| Documentation | `Resources/Documentation.html` |
+| Blog | `Resources/Blog.html` |
+| Contact Support | `Resources/Contact Support.html` |
+| AI Connect | `Resources/AI Connect.html` |
+| Video Tutorials | https://www.youtube.com/@InsightisAI |
+
+### Company
+| Page | File |
+|---|---|
+| About Insightis | `Company/About Insightis.html` |
+| Contacts | `Company/Contacts.html` |
+| Success Stories | `Company/Success Stories.html` |
+| Press & Media | `Company/Press Media.html` |
+
+---
+
+## Navigation
+
+The nav bar includes five top-level items with dropdowns: **Platform**, **Solutions**, **Resources**, **Company**, and **Pricing** (direct link). The Company dropdown was added when the Company and Resources page groups were created.
 
 ---
 
@@ -62,6 +86,7 @@ Then open `http://localhost:8090`
 ```
 Landing/
 ├── index.html
+├── Pricing.html
 ├── README.md
 ├── Platform/
 │   ├── AI Chat.html
@@ -70,13 +95,23 @@ Landing/
 │   ├── Semantic Layer.html
 │   ├── Reports.html
 │   └── Memory & Storage.html
-└── Solutions/
-    ├── RevOps BizOps.html
-    ├── Founders CEOs.html
-    ├── Marketing Teams.html
-    ├── Product Teams.html
-    ├── Data Analytics Teams.html
-    └── Operations Finance.html
+├── Solutions/
+│   ├── RevOps BizOps.html
+│   ├── Founders CEOs.html
+│   ├── Marketing Teams.html
+│   ├── Product Teams.html
+│   ├── Data Analytics Teams.html
+│   └── Operations Finance.html
+├── Resources/
+│   ├── Documentation.html
+│   ├── Blog.html
+│   ├── Contact Support.html
+│   └── AI Connect.html
+└── Company/
+    ├── About Insightis.html
+    ├── Contacts.html
+    ├── Success Stories.html
+    └── Press Media.html
 ```
 
 ---

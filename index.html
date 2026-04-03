@@ -2635,6 +2635,16 @@ function Header() {
     'For Product Teams': 'Solutions/Product Teams.html',
     'For Data & Analytics Teams': 'Solutions/Data Analytics Teams.html',
     'For Operations & Finance': 'Solutions/Operations Finance.html',
+    'Pricing': 'Pricing.html',
+    'Documentation': 'Resources/Documentation.html',
+    'Blog': 'Resources/Blog.html',
+    'Contact Support': 'Resources/Contact Support.html',
+    'AI Connect': 'Resources/AI Connect.html',
+    'About Insightis': 'Company/About Insightis.html',
+    'Contacts': 'Company/Contacts.html',
+    'Success Stories': 'Company/Success Stories.html',
+    'Press & Media': 'Company/Press Media.html',
+    'Video Tutorials': 'https://www.youtube.com/@InsightisAI',
   };
 
   const dropdowns = {
@@ -2676,10 +2686,22 @@ function Header() {
         { heading: 'CONNECT', items: [
           { label: 'Contact Support', desc: 'Get help from our team', icon: 'support' },
           { label: 'Roadmap', desc: 'Follow product development in real time', icon: 'map' },
-          { label: 'AI Connect', desc: 'Connect your insights to any AI system', icon: 'grid', comingSoon: true },
+          { label: 'AI Connect', desc: 'Connect your insights to any AI system', icon: 'grid' },
         ]},
       ]
-    }
+    },
+    Company: {
+      sections: [
+        { heading: 'ABOUT', items: [
+          { label: 'About Insightis', desc: 'Our mission and story', icon: 'star' },
+          { label: 'Success Stories', desc: 'How customers use Insightis', icon: 'pulse' },
+        ]},
+        { heading: 'CONNECT', items: [
+          { label: 'Contacts', desc: 'Get in touch with us', icon: 'support' },
+          { label: 'Press & Media', desc: 'Media kit and press inquiries', icon: 'rss' },
+        ]},
+      ]
+    },
   };
 
   const hasDropdown = (link) => !!dropdowns[link];
@@ -2718,7 +2740,7 @@ function Header() {
 
             {/* Desktop Nav */}
             <div className="hidden md:flex items-center" style={{gap:'2px'}}>
-              {['Platform', 'Solutions', 'Resources', 'Pricing'].map(link => (
+              {['Platform', 'Solutions', 'Resources', 'Company', 'Pricing'].map(link => (
                 <div key={link}>
                   {hasDropdown(link) ? (
                     <button
@@ -2732,7 +2754,7 @@ function Header() {
                       </svg>
                     </button>
                   ) : (
-                    <a href="#" className="flex items-center px-4 py-1.5 rounded-full text-sm text-[#A0A0B8] hover:text-white hover:bg-white/[0.04] transition-colors">
+                    <a href={linkUrls[link] || '#'} className="flex items-center px-4 py-1.5 rounded-full text-sm text-[#A0A0B8] hover:text-white hover:bg-white/[0.04] transition-colors">
                       {link}
                     </a>
                   )}
@@ -2819,8 +2841,8 @@ function Header() {
             borderRadius:'0 0 24px 24px',
             padding:'16px 24px',
           }}>
-            {['Platform', 'Solutions', 'Resources', 'Pricing'].map(link => (
-              <a key={link} href="#" className="block py-3 text-[#A0A0B8] hover:text-white transition-colors">{link}</a>
+            {['Platform', 'Solutions', 'Resources', 'Company', 'Pricing'].map(link => (
+              <a key={link} href={linkUrls[link] || '#'} className="block py-3 text-[#A0A0B8] hover:text-white transition-colors">{link}</a>
             ))}
             <div className="mt-4 pt-4 border-t border-[#1E1E30] flex flex-col gap-3">
               <a href="#" className="text-sm text-[#A0A0B8]">Sign In</a>
@@ -3677,6 +3699,16 @@ function Footer() {
     'For Product Teams': 'Solutions/Product Teams.html',
     'For Data & Analytics Teams': 'Solutions/Data Analytics Teams.html',
     'For Operations & Finance': 'Solutions/Operations Finance.html',
+    'Pricing': 'Pricing.html',
+    'Documentation': 'Resources/Documentation.html',
+    'Blog': 'Resources/Blog.html',
+    'Contact Support': 'Resources/Contact Support.html',
+    'AI Connect': 'Resources/AI Connect.html',
+    'About Insightis': 'Company/About Insightis.html',
+    'Contacts': 'Company/Contacts.html',
+    'Success Stories': 'Company/Success Stories.html',
+    'Press & Media': 'Company/Press Media.html',
+    'Video Tutorials': 'https://www.youtube.com/@InsightisAI',
   };
   return (
     <footer className="pt-16 pb-8 border-t border-[#1E1E30]">
@@ -3719,7 +3751,7 @@ function Footer() {
               <h4 className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#7878A8] mb-4 whitespace-nowrap">Resources</h4>
               <ul className="flex flex-col gap-2.5">
                 {['Documentation', 'Video Tutorials', 'Blog', 'Contact Support', 'Roadmap', 'AI Connect'].map(link => (
-                  <li key={link}><a href="#" className="text-sm text-[#A0A0B8] hover:text-white transition-colors whitespace-nowrap">{link}</a></li>
+                  <li key={link}><a href={linkUrls[link] || '#'} className="text-sm text-[#A0A0B8] hover:text-white transition-colors whitespace-nowrap">{link}</a></li>
                 ))}
               </ul>
             </div>
@@ -3729,12 +3761,12 @@ function Footer() {
               <h4 className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#7878A8] mb-4 whitespace-nowrap">Company</h4>
               <ul className="flex flex-col gap-2.5">
                 {[
-                  { label: 'About Insightis', href: '#' },
+                  { label: 'About Insightis', href: 'Company/About Insightis.html' },
                   { label: 'About Devart', href: 'https://www.devart.com/company/' },
                   { label: 'Careers', href: 'https://www.devart.com/vacancies/' },
-                  { label: 'Contacts', href: '#' },
-                  { label: 'Success Stories', href: '#' },
-                  { label: 'Press & Media', href: '#' },
+                  { label: 'Contacts', href: 'Company/Contacts.html' },
+                  { label: 'Success Stories', href: 'Company/Success Stories.html' },
+                  { label: 'Press & Media', href: 'Company/Press Media.html' },
                 ].map(link => (
                   <li key={link.label}><a href={link.href} className="text-sm text-[#A0A0B8] hover:text-white transition-colors whitespace-nowrap">{link.label}</a></li>
                 ))}

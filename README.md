@@ -53,7 +53,7 @@ Marketing landing site for **Insightis**, an AI analytics workspace that connect
 
 ## Navigation
 
-The nav bar includes five top-level items with dropdowns: **Platform**, **Solutions**, **Resources**, **Company**, and **Pricing** (direct link). The Company dropdown was added when the Company and Resources page groups were created.
+The nav bar has four top-level items: **Platform**, **Solutions**, and **Resources** (each with a dropdown), and **Pricing** (direct link). Company pages are linked from the footer only.
 
 ---
 

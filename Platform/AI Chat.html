@@ -213,8 +213,10 @@ function Header() {
   const linkUrls = {
     'AI Chat': 'AI Chat.html',
     'Integrations': 'Integrations.html',
+    'Insights Engine': 'Insights Engine.html',
     'Semantic Layer': 'Semantic Layer.html',
     'Reports': 'Reports.html',
+    'Memory & Storage': 'Memory & Storage.html',
   };
 
   const dropdowns = {
@@ -228,7 +230,7 @@ function Header() {
         { heading: 'FEATURES', items: [
           { label: 'Semantic Layer', desc: 'One trusted source of truth', icon: 'bars' },
           { label: 'Reports', desc: 'Save and share answers with your team', icon: 'file' },
-          { label: 'Memory & Storage', desc: 'Your business context, always remembered', icon: 'box', comingSoon: true },
+          { label: 'Memory & Storage', desc: 'Your business context, always remembered', icon: 'box' },
         ]},
       ]
     },
@@ -800,7 +802,7 @@ const GALLERY_DATA = {
       {
         type: 'graph', chart: 'horizontalBar',
         chartData: [
-          { label:'Trial expiry (no activation)', value:-740, display:'-$740' },
+          { label:'Trial expiry (activation)', value:-740, display:'-$740' },
           { label:'Pro \u2192 Starter downgrade', value:-260, display:'-$260' },
           { label:'Low engagement churn', value:-240, display:'-$240' },
           { label:'Annual \u2192 Monthly switch', value:-180, display:'-$180' },
@@ -1561,8 +1563,10 @@ function Footer() {
   const linkUrls = {
     'AI Chat': 'AI Chat.html',
     'Integrations': 'Integrations.html',
+    'Insights Engine': 'Insights Engine.html',
     'Semantic Layer': 'Semantic Layer.html',
     'Reports': 'Reports.html',
+    'Memory & Storage': 'Memory & Storage.html',
   };
   return (
     <footer className="pt-16 pb-8 border-t border-[#1E1E30]">
@@ -1614,8 +1618,15 @@ function Footer() {
             <div>
               <h4 className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#7878A8] mb-4 whitespace-nowrap">Company</h4>
               <ul className="flex flex-col gap-2.5">
-                {['About Insightis', 'About Devart', 'Careers', 'Contacts', 'Success Stories', 'Press & Media'].map(link => (
-                  <li key={link}><a href="#" className="text-sm text-[#A0A0B8] hover:text-white transition-colors whitespace-nowrap">{link}</a></li>
+                {[
+                  { label: 'About Insightis', href: '#' },
+                  { label: 'About Devart', href: 'https://www.devart.com/company/' },
+                  { label: 'Careers', href: 'https://www.devart.com/vacancies/' },
+                  { label: 'Contacts', href: '#' },
+                  { label: 'Success Stories', href: '#' },
+                  { label: 'Press & Media', href: '#' },
+                ].map(link => (
+                  <li key={link.label}><a href={link.href} className="text-sm text-[#A0A0B8] hover:text-white transition-colors whitespace-nowrap">{link.label}</a></li>
                 ))}
               </ul>
             </div>
@@ -1637,10 +1648,10 @@ function Footer() {
         <div className="border-t border-[#1E1E30] pt-6 flex items-center justify-between">
           <p className="text-xs text-[#7878A8]">&copy; Copyright © Devart 2026</p>
           <div className="flex items-center gap-4">
-            <a href="#" className="hover:opacity-80 transition-opacity"><TwitterXIcon size={18} color="#7878A8" /></a>
-            <a href="#" className="hover:opacity-80 transition-opacity"><TikTokIcon size={18} color="#7878A8" /></a>
-            <a href="#" className="hover:opacity-80 transition-opacity"><YouTubeIcon size={18} color="#7878A8" /></a>
-            <a href="#" className="hover:opacity-80 transition-opacity"><LinkedInIcon size={18} color="#7878A8" /></a>
+            <a href="https://x.com/Insightisai" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity"><TwitterXIcon size={18} color="#7878A8" /></a>
+            <a href="https://www.tiktok.com/@insightisai" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity"><TikTokIcon size={18} color="#7878A8" /></a>
+            <a href="https://www.youtube.com/@InsightisAI" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity"><YouTubeIcon size={18} color="#7878A8" /></a>
+            <a href="https://www.linkedin.com/company/112025589" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity"><LinkedInIcon size={18} color="#7878A8" /></a>
           </div>
         </div>
       </div>

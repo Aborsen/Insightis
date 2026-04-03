@@ -1,6 +1,6 @@
 # Insightis — AI-Powered Decision Intelligence
 
-Marketing landing site for **Insightis**, an AI analytics workspace that connects your data and delivers instant natural-language insights — built by the [Devart](https://devart.com) team.
+Marketing landing site for **Insightis**, an AI analytics workspace that connects your data and delivers instant natural-language insights — built by the [Devart](https://www.devart.com/company/) team.
 
 ---
 
@@ -11,8 +11,10 @@ Marketing landing site for **Insightis**, an AI analytics workspace that connect
 | Main Landing | `index.html` |
 | AI Chat | `Platform/AI Chat.html` |
 | Integrations | `Platform/Integrations.html` |
+| Insights Engine | `Platform/Insights Engine.html` |
 | Semantic Layer | `Platform/Semantic Layer.html` |
 | Reports | `Platform/Reports.html` |
+| Memory & Storage | `Platform/Memory & Storage.html` |
 
 ---
 
@@ -44,13 +46,15 @@ Then open `http://localhost:8090`
 
 ```
 Landing/
-├── index.html                   # Main landing page
+├── index.html                    # Main landing page
 ├── README.md
 └── Platform/
     ├── AI Chat.html
     ├── Integrations.html
+    ├── Insights Engine.html
     ├── Semantic Layer.html
-    └── Reports.html
+    ├── Reports.html
+    └── Memory & Storage.html
 ```
 
 ---
@@ -59,4 +63,4 @@ Landing/
 
 Drag and drop the project folder to **[netlify.com/drop](https://netlify.com/drop)** for an instant shareable link.
 
-> **Note:** File names with spaces (`AI Chat.html`, `Semantic Layer.html`) may cause 404s on some hosts. If that happens, rename them to `ai-chat.html` and `semantic-layer.html` — the navigation links will need to be updated to match.
+> **Note:** File names with spaces may cause 404s on some hosts. If that happens, rename files to use hyphens (e.g. `ai-chat.html`) and update the `linkUrls` objects in each file to match.

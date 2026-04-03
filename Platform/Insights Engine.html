@@ -1,0 +1,1326 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Insights Engine — Insightis</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Geist:wght@300;400;500;600;700&family=Geist+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script crossorigin src="https://unpkg.com/react@18/umd/react.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/react-dom@18/umd/react-dom.production.min.js"></script>
+<script crossorigin src="https://unpkg.com/@babel/standalone/babel.min.js"></script>
+<style>
+* { box-sizing: border-box; margin: 0; padding: 0; }
+html { scroll-behavior: smooth; }
+body {
+  font-family: 'Geist', sans-serif;
+  background: #0A0E13;
+  color: #E8F2F5;
+  overflow-x: hidden;
+  -webkit-font-smoothing: antialiased;
+}
+
+body::before {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 256 256' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.03'/%3E%3C/svg%3E");
+  opacity: .4; mix-blend-mode: overlay;
+}
+
+body::after {
+  content: ''; position: fixed; inset: 0; pointer-events: none; z-index: 0;
+  background:
+    radial-gradient(ellipse 80% 60% at 10% 5%, rgba(10,152,150,.09) 0%, transparent 70%),
+    radial-gradient(ellipse 70% 55% at 85% 0%, rgba(110,60,200,.07) 0%, transparent 65%),
+    radial-gradient(ellipse 60% 60% at 75% 45%, rgba(20,80,200,.05) 0%, transparent 60%),
+    radial-gradient(ellipse 70% 55% at 5% 55%, rgba(160,50,220,.045) 0%, transparent 65%),
+    radial-gradient(ellipse 65% 55% at 50% 90%, rgba(10,152,150,.07) 0%, transparent 60%),
+    radial-gradient(ellipse 50% 45% at 95% 75%, rgba(50,90,240,.04) 0%, transparent 55%),
+    radial-gradient(ellipse 45% 40% at 35% 30%, rgba(200,60,180,.03) 0%, transparent 55%);
+}
+
+:root {
+  --mint:#0A9896; --mint-dk:#077270; --mint-lt:#0EC4C1;
+  --mint-vivid:#13D4D1;
+  --mint-glow:rgba(10,152,150,.45);
+  --fd:'Geist',sans-serif;
+  --fb:'Geist',sans-serif;
+  --fm:'Geist Mono',monospace;
+}
+
+@keyframes fadeUp { from{opacity:0;transform:translateY(20px)} to{opacity:1;transform:translateY(0)} }
+@keyframes fadeIn { from{opacity:0} to{opacity:1} }
+@keyframes slideUp { from{opacity:0;transform:translateY(12px)} to{opacity:1;transform:translateY(0)} }
+@keyframes blink  { 0%,100%{opacity:1} 50%{opacity:0} }
+@keyframes pulse  { 0%,100%{opacity:.4;transform:scale(.85)} 50%{opacity:1;transform:scale(1)} }
+@keyframes shimmer { 0%{background-position:-200% 0} 100%{background-position:200% 0} }
+@keyframes typing { from{width:0} to{width:100%} }
+@keyframes glowPulse {
+  0%,100%{box-shadow:0 0 8px rgba(9,160,157,.2), 0 0 20px rgba(9,160,157,.1)}
+  50%{box-shadow:0 0 16px rgba(9,160,157,.4), 0 0 40px rgba(9,160,157,.2)}
+}
+
+.fu0 { animation: fadeUp .7s ease both; }
+.fu1 { animation: fadeUp .7s ease .1s both; }
+.fu2 { animation: fadeUp .7s ease .2s both; }
+.fu3 { animation: fadeUp .7s ease .35s both; }
+.fu4 { animation: fadeUp .7s ease .5s both; }
+
+.chat-bubble-user {
+  background: rgba(9,160,157,0.12);
+  border: 1px solid rgba(9,160,157,0.25);
+  border-radius: 16px 16px 4px 16px;
+  padding: 10px 14px;
+  font-size: 13.5px;
+  color: #E8F2F5;
+  align-self: flex-end;
+  max-width: 85%;
+}
+.chat-bubble-ai {
+  background: rgba(255,255,255,0.038);
+  border: 1px solid rgba(255,255,255,0.07);
+  border-radius: 4px 16px 16px 16px;
+  padding: 12px 14px;
+  font-size: 13.5px;
+  color: #C0D4DC;
+  align-self: flex-start;
+  max-width: 95%;
+  line-height: 1.6;
+}
+.typing-dot {
+  width: 6px; height: 6px; border-radius: 50%;
+  background: #0EC4C1;
+  animation: pulse 1.2s ease-in-out infinite;
+}
+.typing-dot:nth-child(2) { animation-delay: .2s; }
+.typing-dot:nth-child(3) { animation-delay: .4s; }
+
+::-webkit-scrollbar { width: 4px; }
+::-webkit-scrollbar-thumb { background: rgba(255,255,255,0.1); border-radius: 2px; }
+section { position: relative; }
+
+/* Showcase panel */
+.sc-wrap{display:grid;grid-template-columns:320px 1fr;border-radius:16px;overflow:hidden;border:1px solid rgba(255,255,255,.07);box-shadow:0 4px 6px rgba(0,0,0,.5),0 32px 100px rgba(0,0,0,.6);height:680px;width:100%;position:relative}
+.sc-wrap::before{content:'';position:absolute;top:0;left:0;right:0;height:1px;background:linear-gradient(90deg,transparent,rgba(10,152,150,.6),rgba(255,255,255,.1),rgba(10,152,150,.6),transparent);z-index:20;pointer-events:none}
+.sc-tabs{display:flex;flex-direction:column;background:rgba(10,14,19,.95);border-right:1px solid rgba(255,255,255,.05)}
+.sc-tab{flex:1;padding:0 28px;display:flex;flex-direction:column;justify-content:center;border-bottom:1px solid rgba(255,255,255,.04);cursor:pointer;min-height:88px;transition:background .2s;position:relative}
+.sc-tab:last-child{border-bottom:none}
+.sc-tab::before{content:'';position:absolute;left:0;top:0;bottom:0;width:3px;background:#0A9896;opacity:0;transition:opacity .25s;border-radius:0 2px 2px 0}
+.sc-tab.active::before{opacity:1}
+.sc-tab.active{background:rgba(7,128,126,.1)}
+.sc-tab:hover:not(.active){background:rgba(255,255,255,.025)}
+.sc-tab-label{font-size:14px;font-weight:600;color:rgba(255,255,255,.35);transition:color .2s;letter-spacing:-.02em}
+.sc-tab.active .sc-tab-label{color:#fff}
+.sc-tab-desc{font-size:11.5px;color:rgba(255,255,255,.4);margin-top:5px;line-height:1.5;max-height:0;overflow:hidden;opacity:0;transition:max-height .35s ease,opacity .35s ease}
+.sc-tab.active .sc-tab-desc{max-height:48px;opacity:1;color:rgba(255,255,255,.5)}
+.sc-panel-wrap{position:relative;background:radial-gradient(ellipse 100% 80% at 30% 30%,rgba(10,152,150,.06) 0%,transparent 60%),rgba(10,14,19,.97);display:flex;align-items:flex-start;justify-content:center;overflow-y:auto;overflow-x:hidden;border-left:1px solid rgba(255,255,255,.04)}
+
+@media(max-width:768px){
+  .sc-wrap{grid-template-columns:1fr!important;height:auto!important}
+  .sc-tabs{flex-direction:row!important;overflow-x:auto!important;border-right:none!important;border-bottom:1px solid rgba(255,255,255,.05)!important}
+  .sc-tab{min-width:160px!important;min-height:60px!important;padding:12px 20px!important;border-bottom:none!important;border-right:1px solid rgba(255,255,255,.04)!important}
+  .sc-tab::before{left:0;right:0;top:auto;bottom:0;width:auto;height:3px;border-radius:2px 2px 0 0}
+  .sc-panel-wrap{height:auto!important;min-height:520px}
+  [data-steps-grid]{grid-template-columns:1fr!important}
+  [data-compare-grid]{grid-template-columns:1fr!important}
+  [data-caps-grid]{grid-template-columns:1fr!important}
+}
+</style>
+</head>
+<body>
+
+<div id="root"></div>
+
+<script type="text/babel">
+const { useState, useEffect, useRef } = React;
+
+/* ── ICONS ── */
+function MenuIcon({ size = 24, color = "#fff" }) {
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="3" y1="12" x2="21" y2="12"/><line x1="3" y1="6" x2="21" y2="6"/><line x1="3" y1="18" x2="21" y2="18"/></svg>;
+}
+function CloseIcon({ size = 24, color = "#fff" }) {
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill="none" stroke={color} strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></svg>;
+}
+function TwitterXIcon({ size = 16, color = "#A0A0B8" }) {
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill={color}><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>;
+}
+function LinkedInIcon({ size = 16, color = "#A0A0B8" }) {
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill={color}><path d="M20.447 20.452h-3.554v-5.569c0-1.328-.027-3.037-1.852-3.037-1.853 0-2.136 1.445-2.136 2.939v5.667H9.351V9h3.414v1.561h.046c.477-.9 1.637-1.85 3.37-1.85 3.601 0 4.267 2.37 4.267 5.455v6.286zM5.337 7.433c-1.144 0-2.063-.926-2.063-2.065 0-1.138.92-2.063 2.063-2.063 1.14 0 2.064.925 2.064 2.063 0 1.139-.925 2.065-2.064 2.065zm1.782 13.019H3.555V9h3.564v11.452zM22.225 0H1.771C.792 0 0 .774 0 1.729v20.542C0 23.227.792 24 1.771 24h20.451C23.2 24 24 23.227 24 22.271V1.729C24 .774 23.2 0 22.222 0h.003z"/></svg>;
+}
+function YouTubeIcon({ size = 16, color = "#A0A0B8" }) {
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill={color}><path d="M23.498 6.186a3.016 3.016 0 0 0-2.122-2.136C19.505 3.545 12 3.545 12 3.545s-7.505 0-9.377.505A3.017 3.017 0 0 0 .502 6.186C0 8.07 0 12 0 12s0 3.93.502 5.814a3.016 3.016 0 0 0 2.122 2.136c1.871.505 9.376.505 9.376.505s7.505 0 9.377-.505a3.015 3.015 0 0 0 2.122-2.136C24 15.93 24 12 24 12s0-3.93-.502-5.814zM9.545 15.568V8.432L15.818 12l-6.273 3.568z"/></svg>;
+}
+function TikTokIcon({ size = 16, color = "#A0A0B8" }) {
+  return <svg width={size} height={size} viewBox="0 0 24 24" fill={color}><path d="M19.59 6.69a4.83 4.83 0 01-3.77-4.25V2h-3.45v13.67a2.89 2.89 0 01-2.88 2.5 2.89 2.89 0 01-2.89-2.89 2.89 2.89 0 012.89-2.89c.28 0 .54.04.79.1v-3.5a6.37 6.37 0 00-.79-.05A6.34 6.34 0 003.15 15.2a6.34 6.34 0 0010.86 4.43v-7.15a8.16 8.16 0 005.58 2.17v-3.4a4.85 4.85 0 01-1-.16l.01-.02V6.69h.99z"/></svg>;
+}
+
+/* ── HEADER ── */
+function Header() {
+  const [scrolled, setScrolled] = useState(false);
+  const [mobileOpen, setMobileOpen] = useState(false);
+  const [activeDropdown, setActiveDropdown] = useState(null);
+  const navRef = useRef(null);
+
+  useEffect(() => {
+    const handleScroll = () => setScrolled(window.scrollY > 20);
+    window.addEventListener('scroll', handleScroll);
+    return () => window.removeEventListener('scroll', handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const handleClick = (e) => {
+      if (navRef.current && !navRef.current.contains(e.target)) setActiveDropdown(null);
+    };
+    document.addEventListener('mousedown', handleClick);
+    return () => document.removeEventListener('mousedown', handleClick);
+  }, []);
+
+  const NAV_ICONS = {
+    chat: 'M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z M8 11h.01 M12 11h.01 M16 11h.01',
+    link: 'M12 22v-5 M9 8V2 M15 8V2 M18 8H6a3 3 0 0 0-3 3v1a3 3 0 0 0 3 3h12a3 3 0 0 0 3-3v-1a3 3 0 0 0-3-3z',
+    file: 'M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z M14 2v6h6 M8 18v-4 M12 18v-2 M16 18v-6',
+    bars: 'M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z M2 12l8.58 3.91a2 2 0 0 0 1.66 0L21 12 M2 17l8.58 3.91a2 2 0 0 0 1.66 0L21 17',
+    box: 'M12 3l8 4.5v9L12 21l-8-4.5v-9L12 3z M12 3v9 M20 7.5l-8 4.5 M4 7.5l8 4.5',
+    dollar: 'M23 6l-9.5 9.5-5-5L1 18 M17 6h6v6',
+    star: 'M2 20H22 M5 20L7 12L12 17L17 12L19 20H5Z',
+    pulse: 'M13 2L3 14h9l-1 8 10-12h-9l1-8z',
+    settings: 'M21 4H8 M3 4h1 M4 4a3 3 0 1 0 6 0 3 3 0 0 0-6 0 M21 12h-5 M3 12h8 M16 12a3 3 0 1 0 6 0 3 3 0 0 0-6 0 M21 20H8 M3 20h1 M4 20a3 3 0 1 0 6 0 3 3 0 0 0-6 0',
+    play: 'M12 22a10 10 0 1 0 0-20 10 10 0 0 0 0 20z M10 8l6 4-6 4V8z',
+    rss: 'M20.24 12.24a6 6 0 0 0-8.49-8.49L5 10.5V19h8.5z M16 6l2 2 M2 21.5l6.36-6.36',
+    support: 'M3 18v-6a9 9 0 0 1 18 0v6 M21 19a2 2 0 0 1-2 2h-1a2 2 0 0 1-2-2v-3a2 2 0 0 1 2-2h3z M3 19a2 2 0 0 0 2 2h1a2 2 0 0 0 2-2v-3a2 2 0 0 0-2-2H3z',
+    grid: 'M3 3h7v7H3z M14 3h7v7h-7z M3 14h7v7H3z M14 14h7v7h-7z',
+    map: 'M18 6H5a2 2 0 0 0-2 2v3a2 2 0 0 0 2 2h13l4-3.5L18 6z M12 12v8 M12 2v4',
+  };
+
+  function NavIcon({ name }) {
+    const d = NAV_ICONS[name];
+    if (!d) return null;
+    const paths = d.split(' M').map((p, i) => i === 0 ? p : 'M' + p);
+    return (
+      <svg width="15" height="15" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+        {paths.map((p, i) => <path key={i} d={p} />)}
+      </svg>
+    );
+  }
+
+  const linkUrls = {
+    'AI Chat': 'AI Chat.html',
+    'Integrations': 'Integrations.html',
+    'Insights Engine': 'Insights Engine.html',
+    'Semantic Layer': 'Semantic Layer.html',
+    'Reports': 'Reports.html',
+    'Memory & Storage': 'Memory & Storage.html',
+  };
+
+  const dropdowns = {
+    Platform: {
+      sections: [
+        { heading: 'PRODUCT', items: [
+          { label: 'AI Chat', desc: 'Ask anything about your data', icon: 'chat' },
+          { label: 'Integrations', desc: 'Connect 200+ sources', icon: 'link' },
+          { label: 'Insights Engine', desc: 'Automated insights from your data', icon: 'pulse' },
+        ]},
+        { heading: 'FEATURES', items: [
+          { label: 'Semantic Layer', desc: 'One trusted source of truth', icon: 'bars' },
+          { label: 'Reports', desc: 'Save and share answers with your team', icon: 'file' },
+          { label: 'Memory & Storage', desc: 'Your business context, always remembered', icon: 'box' },
+        ]},
+      ]
+    },
+    Solutions: {
+      sections: [
+        { heading: 'BY ROLE', items: [
+          { label: 'For RevOps & BizOps', desc: 'Revenue operations and business intelligence', icon: 'dollar' },
+          { label: 'For Founders & CEOs', desc: 'Strategic KPIs and company health at a glance', icon: 'star' },
+          { label: 'For Marketing Teams', desc: 'Campaign analytics and cross-channel attribution', icon: 'pulse' },
+        ]},
+        { heading: 'BY TEAM', items: [
+          { label: 'For Product Teams', desc: 'Usage metrics and feature adoption tracking', icon: 'box' },
+          { label: 'For Data & Analytics Teams', desc: 'Advanced querying and data exploration', icon: 'bars' },
+          { label: 'For Operations & Finance', desc: 'Cost tracking and operational efficiency', icon: 'settings' },
+        ]},
+      ]
+    },
+    Resources: {
+      sections: [
+        { heading: 'LEARN', items: [
+          { label: 'Documentation', desc: 'Setup guides and API reference', icon: 'file' },
+          { label: 'Video Tutorials', desc: 'Step-by-step walkthroughs', icon: 'play' },
+          { label: 'Blog', desc: 'Data analytics tips and product updates', icon: 'rss' },
+        ]},
+        { heading: 'CONNECT', items: [
+          { label: 'Contact Support', desc: 'Get help from our team', icon: 'support' },
+          { label: 'Roadmap', desc: 'Follow product development in real time', icon: 'map' },
+          { label: 'AI Connect', desc: 'Connect your insights to any AI system', icon: 'grid', comingSoon: true },
+        ]},
+      ]
+    }
+  };
+
+  const hasDropdown = (link) => !!dropdowns[link];
+  const anyOpen = activeDropdown !== null;
+
+  return (
+    <>
+      <div style={{position:'sticky',top:0,zIndex:50,backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)'}}>
+      <div ref={navRef} style={{position:'relative',maxWidth:'1240px',width:'calc(100% - 32px)',margin:'0 auto',padding:'12px 0 0'}}>
+        <nav style={{height:'56px',display:'flex',alignItems:'center',background:'rgba(10,14,19,0.92)',backdropFilter:'blur(20px)',WebkitBackdropFilter:'blur(20px)',border:'1px solid rgba(255,255,255,0.08)',borderRadius:'50px',boxShadow:'0 4px 24px rgba(0,0,0,0.3), 0 1px 2px rgba(0,0,0,0.2)',padding:'0 8px 0 24px',transition:'border-radius 0.25s ease, box-shadow 0.3s ease'}}>
+          <div style={{width:'100%'}} className="flex items-center justify-between">
+            <a href="../index.html" className="flex items-center gap-2.5 flex-shrink-0">
+              <svg width="111" height="26" viewBox="0 0 111 26" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-7"><g clipPath="url(#clip0_h)"><path d="M25.4928 10.4151L21.6736 12.7512L25.4928 15.0767L12.7464 22.8371L0 15.0767L3.81921 12.7512L0 10.4151L5.73562 6.92339L7.64785 8.08747L3.82392 10.4151L12.7464 15.8473L21.6689 10.4151L17.845 8.08747L19.7572 6.92339L25.4928 10.4151ZM12.7464 18.1755L5.72881 13.9031L3.8234 15.0767L12.7464 20.5095L21.6694 15.0767L19.7635 13.9031L12.7464 18.1755ZM17.845 10.4209L12.7464 13.525L7.64785 10.4209L9.56426 9.25421L12.7464 11.1915L15.9286 9.25421L17.845 10.4209ZM17.845 5.75931L12.7464 8.86335L7.64785 5.75931L12.7464 2.65527L17.845 5.75931ZM11.4718 5.75878L12.7464 6.53519L14.0211 5.75878L12.7464 4.9829L11.4718 5.75878Z" fill="#1498B9"/><path d="M33.2746 17.5261V5.60823H35.5859V17.5261H33.2746Z" fill="white"/><path d="M38.2797 17.5261V8.0821H40.1758L40.1216 10.9713H40.4466C40.6152 10.261 40.8379 9.67717 41.1148 9.21971C41.4037 8.76226 41.7708 8.41917 42.2163 8.19044C42.6617 7.96171 43.1793 7.84735 43.7692 7.84735C44.8406 7.84735 45.6532 8.22656 46.207 8.98497C46.7728 9.74338 47.0557 10.9171 47.0557 12.5062V17.5261H44.7624V12.7409C44.7624 11.7177 44.6059 10.9713 44.2929 10.5018C43.9919 10.0203 43.5405 9.77949 42.9386 9.77949C42.433 9.77949 42.0056 9.94201 41.6565 10.267C41.3074 10.58 41.0365 11.0014 40.8439 11.5311C40.6633 12.0487 40.567 12.6205 40.555 13.2465V17.5261H38.2797Z" fill="white"/><path d="M53.1255 17.7609C52.4875 17.7609 51.9096 17.6947 51.392 17.5622C50.8864 17.4419 50.453 17.2673 50.0918 17.0386C49.7307 16.7978 49.4418 16.5149 49.2251 16.1899C49.0084 15.8528 48.876 15.4796 48.8278 15.0703L50.6155 14.4022C50.6396 14.7152 50.76 14.9981 50.9767 15.2509C51.1933 15.4917 51.4943 15.6843 51.8795 15.8287C52.2647 15.9732 52.7282 16.0454 53.2699 16.0454C53.8719 16.0454 54.3353 15.9551 54.6604 15.7746C54.9974 15.5819 55.166 15.3111 55.166 14.962C55.166 14.7092 55.0757 14.5105 54.8951 14.3661C54.7145 14.2096 54.4497 14.0832 54.1006 13.9869C53.7635 13.8785 53.3542 13.7762 52.8727 13.6799C52.4273 13.5836 51.9758 13.4752 51.5184 13.3549C51.073 13.2224 50.6576 13.0539 50.2724 12.8493C49.8992 12.6326 49.5922 12.3557 49.3515 12.0186C49.1228 11.6695 49.0084 11.2301 49.0084 10.7004C49.0084 10.1226 49.1589 9.623 49.4598 9.20166C49.7728 8.78032 50.2182 8.44926 50.7961 8.2085C51.386 7.96773 52.0962 7.84735 52.9269 7.84735C53.7093 7.84735 54.3835 7.9557 54.9493 8.17238C55.5271 8.38907 55.9966 8.70207 56.3578 9.11137C56.7189 9.50863 56.9476 9.98415 57.0439 10.5379L55.166 11.1338C55.1299 10.7967 55.0155 10.5138 54.8229 10.2851C54.6303 10.0443 54.3714 9.86376 54.0464 9.74338C53.7214 9.623 53.3422 9.56281 52.9088 9.56281C52.355 9.56281 51.9217 9.65911 51.6087 9.85172C51.2957 10.0443 51.1392 10.3032 51.1392 10.6282C51.1392 10.893 51.2355 11.1037 51.4281 11.2602C51.6327 11.4167 51.9096 11.5431 52.2587 11.6394C52.6199 11.7357 53.0292 11.832 53.4866 11.9283C53.9682 12.0246 54.4316 12.139 54.8771 12.2714C55.3345 12.3918 55.7438 12.5543 56.105 12.759C56.4661 12.9636 56.755 13.2345 56.9717 13.5716C57.1884 13.8966 57.2967 14.3179 57.2967 14.8356C57.2967 15.4616 57.1282 15.9973 56.7911 16.4427C56.4541 16.8761 55.9725 17.2071 55.3465 17.4358C54.7326 17.6525 53.9922 17.7609 53.1255 17.7609Z" fill="white"/><path d="M59.2115 17.5261V8.0821H61.4868V17.5261H59.2115ZM60.3492 6.60139C59.8917 6.60139 59.5366 6.50508 59.2838 6.31247C59.043 6.10782 58.9226 5.8189 58.9226 5.44571C58.9226 5.07253 59.043 4.78963 59.2838 4.59702C59.5366 4.39236 59.8917 4.29004 60.3492 4.29004C60.8307 4.29004 61.1918 4.38635 61.4326 4.57896C61.6734 4.77157 61.7937 5.06049 61.7937 5.44571C61.7937 5.8189 61.6673 6.10782 61.4145 6.31247C61.1738 6.50508 60.8186 6.60139 60.3492 6.60139Z" fill="white"/><path d="M67.709 20.7765C66.6857 20.7765 65.843 20.6982 65.1809 20.5417C64.5309 20.3852 64.0493 20.1505 63.7363 19.8375C63.4233 19.5245 63.2668 19.1393 63.2668 18.6818C63.2668 18.128 63.4835 17.6766 63.9169 17.3275C64.3623 16.9663 65.0184 16.7436 65.8852 16.6594V16.2982C65.2351 16.3103 64.7415 16.2441 64.4045 16.0996C64.0674 15.9431 63.8988 15.6963 63.8988 15.3592C63.8988 15.0342 64.0614 14.7453 64.3864 14.4925C64.7235 14.2397 65.2772 14.029 66.0477 13.8605V13.4993C65.3133 13.4632 64.7415 13.2345 64.3322 12.8131C63.9229 12.3798 63.7183 11.82 63.7183 11.1338C63.7183 10.5198 63.8868 9.97813 64.2239 9.50863C64.561 9.03914 65.0545 8.67197 65.7046 8.40713C66.3667 8.13025 67.1672 7.99181 68.1062 7.99181H72.7831V9.79755L69.8217 9.36417V9.76144C70.5681 9.88182 71.1158 10.0925 71.4649 10.3934C71.8261 10.6944 72.0066 11.1037 72.0066 11.6214C72.0066 12.1149 71.8501 12.5543 71.5371 12.9395C71.2241 13.3127 70.7667 13.6077 70.1648 13.8244C69.5749 14.029 68.8586 14.1313 68.0159 14.1313C67.8594 14.1313 67.6909 14.1253 67.5103 14.1133C67.3298 14.1012 67.0469 14.0711 66.6616 14.023C66.4088 14.2036 66.2042 14.3661 66.0477 14.5105C65.8912 14.643 65.8129 14.7694 65.8129 14.8897C65.8129 14.986 65.8731 15.0703 65.9935 15.1425C66.1139 15.2027 66.2704 15.2449 66.463 15.2689C66.6556 15.293 66.8422 15.3051 67.0228 15.3051H69.5328C69.7735 15.3051 70.0805 15.3231 70.4537 15.3592C70.8389 15.3954 71.2181 15.4917 71.5913 15.6482C71.9765 15.8047 72.2955 16.0514 72.5484 16.3885C72.8132 16.7256 72.9456 17.2011 72.9456 17.815C72.9456 18.5012 72.747 19.061 72.3497 19.4944C71.9645 19.9398 71.3806 20.2648 70.5982 20.4695C69.8277 20.6741 68.8646 20.7765 67.709 20.7765ZM67.9076 18.9346C68.654 18.9346 69.2499 18.8925 69.6953 18.8082C70.1407 18.7239 70.4597 18.5855 70.6523 18.3929C70.8449 18.2123 70.9412 17.9776 70.9412 17.6886C70.9412 17.4238 70.8811 17.2192 70.7607 17.0747C70.6403 16.9182 70.4838 16.8098 70.2912 16.7497C70.1106 16.6895 69.924 16.6534 69.7314 16.6413C69.5388 16.6293 69.3763 16.6233 69.2438 16.6233H67.0228C66.4449 16.7075 66.0356 16.87 65.7949 17.1108C65.5662 17.3516 65.4518 17.6164 65.4518 17.9053C65.4518 18.1943 65.5481 18.4109 65.7407 18.5554C65.9333 18.7119 66.2102 18.8142 66.5713 18.8624C66.9445 18.9105 67.3899 18.9346 67.9076 18.9346ZM67.9618 12.8854C68.5878 12.8854 69.0633 12.7409 69.3883 12.452C69.7133 12.151 69.8759 11.7598 69.8759 11.2783C69.8759 10.7606 69.7073 10.3393 69.3702 10.0142C69.0452 9.67717 68.5697 9.50863 67.9437 9.50863C67.3177 9.50863 66.8302 9.67115 66.4811 9.99618C66.144 10.3212 65.9755 10.7365 65.9755 11.2421C65.9755 11.5672 66.0477 11.8561 66.1921 12.1089C66.3486 12.3497 66.5713 12.5423 66.8603 12.6867C67.1612 12.8192 67.5284 12.8854 67.9618 12.8854Z" fill="white"/><path d="M74.7825 17.5261V4.70536H77.0758V7.64872C77.0758 7.90152 77.0638 8.16035 77.0397 8.42519C77.0277 8.69003 77.0036 8.96089 76.9675 9.23777C76.9314 9.51465 76.8892 9.79153 76.8411 10.0684C76.805 10.3453 76.7628 10.6222 76.7147 10.8991H77.0939C77.2624 10.249 77.4791 9.70125 77.7439 9.25583C78.0088 8.79837 78.3459 8.44926 78.7552 8.2085C79.1765 7.96773 79.6881 7.84735 80.29 7.84735C81.3855 7.84735 82.2041 8.23258 82.7459 9.00303C83.2876 9.76144 83.5584 10.9171 83.5584 12.47V17.5261H81.2651V12.7951C81.2651 11.7598 81.1087 10.9954 80.7957 10.5018C80.4947 10.0082 80.0372 9.76144 79.4233 9.76144C78.9177 9.76144 78.4963 9.91793 78.1593 10.2309C77.8222 10.5319 77.5634 10.9352 77.3828 11.4408C77.2022 11.9464 77.0939 12.5182 77.0578 13.1562V17.5261H74.7825Z" fill="white"/><path d="M89.2495 17.7428C88.2503 17.7428 87.516 17.478 87.0465 16.9483C86.577 16.4066 86.3422 15.5699 86.3422 14.4383V9.9059H84.9518L84.9879 8.10015H85.9089C86.258 8.10015 86.5168 8.04598 86.6853 7.93764C86.8539 7.82929 86.9562 7.63668 86.9923 7.3598L87.209 5.98744H88.5272V8.0821H91.0191V9.97813H88.5272V14.348C88.5272 14.7934 88.6295 15.1185 88.8342 15.3231C89.0509 15.5278 89.3699 15.6301 89.7912 15.6301C90.0199 15.6301 90.2426 15.606 90.4593 15.5579C90.6881 15.4977 90.8987 15.4014 91.0913 15.2689V17.4358C90.7182 17.5562 90.3751 17.6345 90.0621 17.6706C89.7611 17.7187 89.4903 17.7428 89.2495 17.7428Z" fill="white"/><path d="M92.9634 17.5261V8.0821H95.2386V17.5261H92.9634ZM94.101 6.60139C93.6436 6.60139 93.2884 6.50508 93.0356 6.31247C92.7949 6.10782 92.6745 5.8189 92.6745 5.44571C92.6745 5.07253 92.7949 4.78963 93.0356 4.59702C93.2884 4.39236 93.6436 4.29004 94.101 4.29004C94.5825 4.29004 94.9437 4.38635 95.1845 4.57896C95.4252 4.77157 95.5456 5.06049 95.5456 5.44571C95.5456 5.8189 95.4192 6.10782 95.1664 6.31247C94.9256 6.50508 94.5705 6.60139 94.101 6.60139Z" fill="white"/><path d="M101.461 17.7609C100.823 17.7609 100.245 17.6947 99.7273 17.5622C99.2217 17.4419 98.7883 17.2673 98.4272 17.0386C98.066 16.7978 97.7771 16.5149 97.5604 16.1899C97.3437 15.8528 97.2113 15.4796 97.1632 15.0703L98.9508 14.4022C98.9749 14.7152 99.0953 14.9981 99.312 15.2509C99.5287 15.4917 99.8296 15.6843 100.215 15.8287C100.6 15.9732 101.064 16.0454 101.605 16.0454C102.207 16.0454 102.671 15.9551 102.996 15.7746C103.333 15.5819 103.501 15.3111 103.501 14.962C103.501 14.7092 103.411 14.5105 103.23 14.3661C103.05 14.2096 102.785 14.0832 102.436 13.9869C102.099 13.8785 101.69 13.7762 101.208 13.6799C100.763 13.5836 100.311 13.4752 99.8537 13.3549C99.4083 13.2224 98.993 13.0539 98.6077 12.8493C98.2346 12.6326 97.9276 12.3557 97.6868 12.0186C97.4581 11.6695 97.3437 11.2301 97.3437 10.7004C97.3437 10.1226 97.4942 9.623 97.7952 9.20166C98.1082 8.78032 98.5536 8.44926 99.1314 8.2085C99.7213 7.96773 100.432 7.84735 101.262 7.84735C102.045 7.84735 102.719 7.9557 103.285 8.17238C103.862 8.38907 104.332 8.70207 104.693 9.11137C105.054 9.50863 105.283 9.98415 105.379 10.5379L103.501 11.1338C103.465 10.7967 103.351 10.5138 103.158 10.2851C102.966 10.0443 102.707 9.86376 102.382 9.74338C102.057 9.623 101.678 9.56281 101.244 9.56281C100.69 9.56281 100.257 9.65911 99.944 9.85172C99.631 10.0443 99.4745 10.3032 99.4745 10.6282C99.4745 10.893 99.5708 11.1037 99.7634 11.2602C99.9681 11.4167 100.245 11.5431 100.594 11.6394C100.955 11.7357 101.365 11.832 101.822 11.9283C102.303 12.0246 102.767 12.139 103.212 12.2714C103.67 12.3918 104.079 12.5543 104.44 12.759C104.801 12.9636 105.09 13.2345 105.307 13.5716C105.524 13.8966 105.632 14.3179 105.632 14.8356C105.632 15.4616 105.464 15.9973 105.126 16.4427C104.789 16.8761 104.308 17.2071 103.682 17.4358C103.068 17.6525 102.328 17.7609 101.461 17.7609Z" fill="white"/></g><defs><clipPath id="clip0_h"><rect width="111" height="25.4928" fill="white"/></clipPath></defs></svg>
+            </a>
+            <div className="hidden md:flex items-center" style={{gap:'2px'}}>
+              {['Platform', 'Solutions', 'Resources', 'Pricing'].map(link => (
+                <div key={link}>
+                  {hasDropdown(link) ? (
+                    <button onClick={() => setActiveDropdown(activeDropdown === link ? null : link)} className={`flex items-center gap-1 px-4 py-1.5 rounded-full text-sm transition-colors ${activeDropdown === link ? 'text-white bg-white/[0.08]' : 'text-[#A0A0B8] hover:text-white hover:bg-white/[0.04]'}`}>
+                      {link}
+                      <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{transition:'transform 0.2s', transform: activeDropdown === link ? 'rotate(180deg)' : 'rotate(0deg)', opacity:0.5}}><polyline points="6 9 12 15 18 9"/></svg>
+                    </button>
+                  ) : (
+                    <a href="#" className="flex items-center px-4 py-1.5 rounded-full text-sm text-[#A0A0B8] hover:text-white hover:bg-white/[0.04] transition-colors">{link}</a>
+                  )}
+                </div>
+              ))}
+            </div>
+            <div className="hidden md:flex items-center flex-shrink-0" style={{gap:'12px'}}>
+              <a href="#" className="text-sm text-[#A0A0B8] hover:text-white transition-colors px-3 py-1.5">Sign In</a>
+              <a href="#" className="text-sm font-medium text-white bg-[#07807E] hover:bg-[#09A09D] px-5 py-2 rounded-full transition-colors">Start for Free</a>
+            </div>
+            <button onClick={() => setMobileOpen(!mobileOpen)} className="md:hidden p-2">{mobileOpen ? <CloseIcon /> : <MenuIcon />}</button>
+          </div>
+        </nav>
+
+        {anyOpen && dropdowns[activeDropdown] && (
+          <div style={{position:'absolute',left:0,right:0,zIndex:-1,marginTop:'-24px',background:'rgba(10,14,19,0.97)',backdropFilter:'blur(24px)',WebkitBackdropFilter:'blur(24px)',borderLeft:'1px solid rgba(255,255,255,0.08)',borderRight:'1px solid rgba(255,255,255,0.08)',borderBottom:'1px solid rgba(255,255,255,0.08)',borderRadius:'0 0 24px 24px',boxShadow:'0 12px 48px rgba(0,0,0,0.5)'}}>
+            <div style={{padding:'44px 32px 28px'}}>
+              <div className="flex gap-10">
+                {dropdowns[activeDropdown].sections.map((section, si) => (
+                  <div key={si} style={{flex:'1'}}>
+                    <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-[#A0A0B8] mb-4 px-3">{section.heading}</p>
+                    <div className="flex flex-col gap-0.5">
+                      {section.items.map((item, ii) => (
+                        <a key={ii} href={linkUrls[item.label] || '#'} onClick={() => setActiveDropdown(null)} className="flex items-start gap-3 px-3 py-2.5 rounded-xl hover:bg-white/[0.05] transition-colors group">
+                          {item.icon && (
+                            <div style={{flexShrink:0,marginTop:'2px',width:'30px',height:'30px',display:'flex',alignItems:'center',justifyContent:'center',borderRadius:'8px',background:'rgba(10,152,150,0.1)',border:'1px solid rgba(10,152,150,0.2)',color:'#0EC4C1'}}>
+                              <NavIcon name={item.icon} />
+                            </div>
+                          )}
+                          <div className="flex flex-col">
+                            <span className="flex items-center gap-2">
+                              <span className="text-sm font-medium text-white group-hover:text-[#0EC4C1] transition-colors">{item.label}</span>
+                              {item.comingSoon && (<span style={{fontSize:'10px',fontWeight:500,letterSpacing:'0.04em',padding:'1px 6px',borderRadius:'4px',background:'rgba(10,152,150,0.12)',border:'1px solid rgba(10,152,150,0.3)',color:'#0EC4C1',whiteSpace:'nowrap'}}>Coming Soon</span>)}
+                            </span>
+                            <span className="text-xs text-[#A0A0B8] mt-0.5 leading-relaxed">{item.desc}</span>
+                          </div>
+                        </a>
+                      ))}
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+          </div>
+        )}
+
+        {mobileOpen && (
+          <div className="md:hidden" style={{position:'absolute',left:0,right:0,zIndex:-1,background:'rgba(10,14,19,0.97)',backdropFilter:'blur(24px)',WebkitBackdropFilter:'blur(24px)',borderLeft:'1px solid rgba(255,255,255,0.08)',borderRight:'1px solid rgba(255,255,255,0.08)',borderBottom:'1px solid rgba(255,255,255,0.08)',borderRadius:'0 0 24px 24px',padding:'16px 24px'}}>
+            {['Platform', 'Solutions', 'Resources', 'Pricing'].map(link => (
+              <a key={link} href="#" className="block py-3 text-[#A0A0B8] hover:text-white transition-colors">{link}</a>
+            ))}
+            <div className="mt-4 pt-4 border-t border-[#1E1E30] flex flex-col gap-3">
+              <a href="#" className="text-sm text-[#A0A0B8]">Sign In</a>
+              <a href="#" className="text-sm font-medium text-white bg-[#07807E] px-5 py-2.5 rounded-full text-center">Start for Free</a>
+            </div>
+          </div>
+        )}
+      </div>
+      </div>
+      {anyOpen && (<div onClick={() => setActiveDropdown(null)} style={{position:'fixed',inset:0,zIndex:48,background:'rgba(0,0,0,0.4)',backdropFilter:'blur(2px)'}}/>)}
+    </>
+  );
+}
+
+
+/* ── CHART COMPONENTS ── */
+function HorizontalBarChart({ bars }) {
+  const maxVal = Math.max(...bars.map(b => Math.abs(b.value)));
+  return (
+    <div style={{display:'flex',flexDirection:'column',gap:'6px',margin:'8px 0'}}>
+      {bars.map((b,i) => (
+        <div key={i} style={{display:'flex',alignItems:'center',gap:'10px'}}>
+          <span style={{fontSize:'11px',color:'#7FA0AC',fontFamily:'Geist Mono,monospace',minWidth:'120px',textAlign:'right',flexShrink:0}}>{b.label}</span>
+          <div style={{flex:1,background:'rgba(255,255,255,.04)',borderRadius:'4px',height:'18px',position:'relative',overflow:'hidden'}}>
+            <div style={{width:`${(Math.abs(b.value)/maxVal)*100}%`,height:'100%',borderRadius:'4px',background: b.color || (b.value < 0 ? 'rgba(220,80,80,.7)' : 'rgba(9,160,157,.6)')}}/>
+          </div>
+          <span style={{fontSize:'12px',fontFamily:'Geist Mono,monospace',color: b.value < 0 ? '#E06060' : '#0EC4C1',minWidth:'60px',flexShrink:0}}>{b.display}</span>
+        </div>
+      ))}
+    </div>
+  );
+}
+
+function PieChart({ slices }) {
+  const total = slices.reduce((s, d) => s + Math.abs(d.value), 0);
+  const colors = ['#0EC4C1','#09A09D','#F87171','#FBBF24','#818CF8','#34D399'];
+  let angle = -Math.PI / 2;
+  const cx = 90, cy = 90, r = 75, ri = 38;
+  const paths = slices.map((s, i) => {
+    const sweep = (Math.abs(s.value) / total) * 2 * Math.PI;
+    const x1 = cx + r * Math.cos(angle), y1 = cy + r * Math.sin(angle);
+    const x2 = cx + r * Math.cos(angle + sweep), y2 = cy + r * Math.sin(angle + sweep);
+    const xi1 = cx + ri * Math.cos(angle), yi1 = cy + ri * Math.sin(angle);
+    const xi2 = cx + ri * Math.cos(angle + sweep), yi2 = cy + ri * Math.sin(angle + sweep);
+    const large = sweep > Math.PI ? 1 : 0;
+    const d = `M${x1},${y1} A${r},${r} 0 ${large},1 ${x2},${y2} L${xi2},${yi2} A${ri},${ri} 0 ${large},0 ${xi1},${yi1} Z`;
+    angle += sweep;
+    return { d, color: s.color || colors[i % colors.length], label: s.label, pct: Math.round((Math.abs(s.value)/total)*100) };
+  });
+  return (
+    <div style={{display:'flex',alignItems:'center',gap:'24px',margin:'12px 0'}}>
+      <svg viewBox="0 0 180 180" style={{width:'160px',height:'160px',flexShrink:0}}>
+        {paths.map((p,i) => <path key={i} d={p.d} fill={p.color} opacity=".85"/>)}
+      </svg>
+      <div style={{display:'flex',flexDirection:'column',gap:'10px',flex:1}}>
+        {paths.map((p,i) => (
+          <div key={i} style={{display:'flex',alignItems:'center',gap:'8px'}}>
+            <div style={{width:'10px',height:'10px',borderRadius:'3px',background:p.color,flexShrink:0}}/>
+            <span style={{fontSize:'12px',color:'#7FA0AC',fontFamily:'Geist Mono,monospace',flex:1}}>{p.label}</span>
+            <span style={{fontSize:'12px',color:'#E8F2F5',fontFamily:'Geist Mono,monospace',fontWeight:500}}>{p.pct}%</span>
+          </div>
+        ))}
+      </div>
+    </div>
+  );
+}
+
+function TreemapChart({ items }) {
+  const colors = ['#0EC4C1','#09A09D','#818CF8','#FBBF24','#F87171','#34D399','#60A5FA'];
+  const sorted = [...items].sort((a,b) => b.value - a.value);
+  const total = sorted.reduce((s,i) => s + i.value, 0);
+  const W = 620, H = 150, gap = 4;
+  const leftW = Math.round((sorted[0].value / total) * W);
+  const rest = sorted.slice(1);
+  const restTotal = rest.reduce((s,i) => s + i.value, 0) || 1;
+  const cells = [{ x:0, y:0, w:leftW - gap, h:H, item:sorted[0], color:sorted[0].color || colors[0] }];
+  let y = 0;
+  rest.forEach((item, i) => {
+    const h = Math.round((item.value / restTotal) * H);
+    cells.push({ x:leftW, y, w:W - leftW, h:h - gap, item, color:item.color || colors[i+1] });
+    y += h;
+  });
+  return (
+    <div style={{margin:'6px 0'}}>
+      <svg viewBox={`0 0 ${W} ${H}`} style={{width:'100%',maxHeight:'150px'}}>
+        {cells.map((c,i) => (
+          <g key={i}>
+            <rect x={c.x} y={c.y} width={Math.max(0,c.w)} height={Math.max(0,c.h)} fill={c.color} opacity=".78" rx="6"/>
+            <text x={c.x+c.w/2} y={c.y+c.h/2-(c.h>50?12:0)} textAnchor="middle" dominantBaseline="middle" style={{fontSize:c.w>180?'11px':'9px',fill:'rgba(255,255,255,.8)',fontFamily:'Geist Mono,monospace'}}>{c.item.label}</text>
+            {c.h>50 && <text x={c.x+c.w/2} y={c.y+c.h/2+14} textAnchor="middle" dominantBaseline="middle" style={{fontSize:'16px',fill:'#fff',fontFamily:'Geist Mono,monospace',fontWeight:500}}>{c.item.display}</text>}
+          </g>
+        ))}
+      </svg>
+    </div>
+  );
+}
+
+function LineChart({ points, labels }) {
+  const max = Math.max(...points);
+  const min = Math.min(...points) * 0.9;
+  const range = max - min || 1;
+  const w = 420, h = 100, px = 30, py = 8;
+  const chartW = w - px*2, chartH = h - py*2;
+  const coords = points.map((v,i) => ({
+    x: px + (i / (points.length-1)) * chartW,
+    y: py + chartH - ((v - min) / range) * chartH,
+  }));
+  const line = coords.map((c,i) => `${i===0?'M':'L'}${c.x},${c.y}`).join(' ');
+  const area = line + ` L${coords[coords.length-1].x},${h-py} L${coords[0].x},${h-py} Z`;
+  return (
+    <div style={{margin:'6px 0'}}>
+      <svg viewBox={`0 0 ${w} ${h}`} style={{width:'100%',height:'auto'}}>
+        <defs><linearGradient id="areaFill" x1="0" y1="0" x2="0" y2="1"><stop offset="0%" stopColor="#09A09D" stopOpacity=".25"/><stop offset="100%" stopColor="#09A09D" stopOpacity=".02"/></linearGradient></defs>
+        {[0,.25,.5,.75,1].map(f => <line key={f} x1={px} y1={py+chartH*f} x2={w-px} y2={py+chartH*f} stroke="rgba(255,255,255,.05)" strokeWidth="1"/>)}
+        <path d={area} fill="url(#areaFill)"/>
+        <path d={line} fill="none" stroke="#0EC4C1" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/>
+        {coords.map((c,i) => <circle key={i} cx={c.x} cy={c.y} r="3" fill="#0EC4C1" stroke="#0A0E13" strokeWidth="1.5"/>)}
+        {labels && labels.map((l,i) => <text key={i} x={coords[i].x} y={h-1} textAnchor="middle" style={{fontSize:'9px',fill:'#6E8D9A',fontFamily:'Geist Mono,monospace'}}>{l}</text>)}
+      </svg>
+    </div>
+  );
+}
+
+
+/* ── HERO CANVAS ── */
+function HeroCanvas() {
+  const cvRef = useRef(null);
+  useEffect(() => {
+    const cv = cvRef.current;
+    const ctx = cv.getContext('2d');
+    let raf, startTime = null;
+    const T=[9,160,157], T2=[14,196,193], T3=[200,255,254];
+    function resize(){ cv.width=window.innerWidth; cv.height=window.innerHeight; }
+    resize(); window.addEventListener('resize', resize);
+    const CX=()=>cv.width/2, CY=()=>cv.height*0.46;
+    const easeOut3=t=>1-Math.pow(1-t,3), easeOut5=t=>1-Math.pow(1-t,5);
+    const easeIn3=t=>t*t*t;
+    const clamp=(v,a,b)=>Math.max(a,Math.min(b,v));
+
+    function bezier(sx,sy,cpx,cpy,ex,ey,t){
+      const mt=1-t;
+      return{x:mt*mt*sx+2*mt*t*cpx+t*t*ex,y:mt*mt*sy+2*mt*t*cpy+t*t*ey};
+    }
+
+    const question = 'Why is my CSAT low after the last update?';
+    const answer = 'CSAT dropped to 3.2 \u2014 down 18% since v4.1 release';
+    const fragments = [
+      {text:'CSAT: 3.2',nx:-0.32,ny:-0.22},{text:'\u2193 18%',nx:0.30,ny:-0.18},
+      {text:'47 tickets',nx:-0.12,ny:0.26},{text:'v4.1',nx:0.14,ny:0.20},
+      {text:'Avg reply: 6h',nx:-0.34,ny:0.04},{text:'NPS: 32',nx:0.36,ny:0.08},
+      {text:'142 reviews',nx:0.20,ny:-0.28},{text:'3.8\u2192 3.2',nx:-0.24,ny:-0.12},
+    ].map((m,i)=>({...m,phase:Math.random()*Math.PI*2,dx:(Math.random()-.5)*0.012,dy:(Math.random()-.5)*0.01}));
+
+    const SOURCES=[
+      {name:'Zendesk',nx:-0.28,ny:-0.20},{name:'Freshdesk',nx:0.26,ny:-0.22},
+      {name:'PostgreSQL',nx:-0.06,ny:-0.28},{name:'GA4',nx:0.30,ny:0.10},
+      {name:'Mixpanel',nx:-0.30,ny:0.12},
+    ];
+    const N=SOURCES.length;
+
+    function drawQuestion(t){
+      if(t>3.2)return;
+      const fadeOut=t>2.5?clamp((t-2.5)/0.5,0,1):0;
+      const a=(1-fadeOut);
+      if(a<0.01)return;
+      const chars=Math.floor(clamp(t/0.04,0,question.length));
+      const qText=question.substring(0,chars);
+      const ansA=clamp((t-1.2)/0.4,0,1);
+      ctx.save(); ctx.globalAlpha=a;
+      ctx.font=`500 ${Math.min(22,cv.width*.022)}px 'Geist Mono',monospace`;
+      ctx.fillStyle=`rgba(${T3[0]},${T3[1]},${T3[2]},0.9)`;
+      ctx.textAlign='center'; ctx.textBaseline='middle';
+      ctx.fillText(qText,CX(),CY()-20);
+      if(chars>=question.length && t<2.5){
+        ctx.fillStyle=`rgba(${T3[0]},${T3[1]},${T3[2]},${0.6*Math.abs(Math.sin(t*4))})`;
+        const tw=ctx.measureText(qText).width;
+        ctx.fillRect(CX()+tw/2+2,CY()-32,2,24);
+      }
+      if(ansA>0){
+        ctx.globalAlpha=a*ansA;
+        ctx.font=`400 ${Math.min(15,cv.width*.016)}px 'Geist Mono',monospace`;
+        ctx.fillStyle=`rgba(${T[0]},${T[1]},${T[2]},0.7)`;
+        ctx.fillText(answer,CX(),CY()+16);
+      }
+      ctx.restore();
+    }
+
+    function drawFragments(t){
+      if(t>3.2)return;
+      const pull=t>2.5?clamp((t-2.5)/0.5,0,1):0;
+      const pullE=easeIn3(pull);
+      const dim=Math.min(cv.width,cv.height);
+      fragments.forEach((f,i)=>{
+        const appear=clamp((t-0.3-i*0.08)/0.4,0,1);
+        if(appear<0.01)return;
+        let x=CX()+f.nx*dim+Math.sin(t*0.8+f.phase)*12;
+        let y=CY()+f.ny*dim+Math.cos(t*0.6+f.phase)*8;
+        x=x+(CX()-x)*pullE;
+        y=y+(CY()-y)*pullE;
+        const a=appear*(1-pullE*0.8);
+        ctx.save(); ctx.globalAlpha=a*0.35;
+        ctx.font=`500 ${Math.min(13,cv.width*.013)}px 'Geist Mono',monospace`;
+        ctx.fillStyle=`rgba(${T[0]},${T[1]},${T[2]},1)`;
+        ctx.textAlign='center'; ctx.textBaseline='middle';
+        ctx.fillText(f.text,x,y);
+        ctx.restore();
+      });
+    }
+
+    function drawTrigger(t){
+      if(t<1.6||t>3.4)return;
+      const appear=clamp((t-1.6)/0.3,0,1);
+      const fadeOut=t>2.6?clamp((t-2.6)/0.5,0,1):0;
+      const a=appear*(1-fadeOut);
+      if(a<0.01)return;
+      const glow=0.5+Math.sin(t*5)*0.3;
+      ctx.save(); ctx.globalAlpha=a;
+      const bw=180,bh=36,bx=CX()-bw/2,by=CY()+46;
+      ctx.fillStyle=`rgba(${T[0]},${T[1]},${T[2]},${0.12*glow})`;
+      ctx.strokeStyle=`rgba(${T2[0]},${T2[1]},${T2[2]},${0.4*glow})`;
+      ctx.lineWidth=1;
+      ctx.beginPath();
+      const r=10;
+      ctx.moveTo(bx+r,by);ctx.arcTo(bx+bw,by,bx+bw,by+bh,r);ctx.arcTo(bx+bw,by+bh,bx,by+bh,r);ctx.arcTo(bx,by+bh,bx,by,r);ctx.arcTo(bx,by,bx+bw,by,r);
+      ctx.closePath();ctx.fill();ctx.stroke();
+      ctx.font=`500 ${Math.min(13,cv.width*.014)}px 'Geist Mono',monospace`;
+      ctx.fillStyle=`rgba(${T2[0]},${T2[1]},${T2[2]},0.9)`;
+      ctx.textAlign='center';ctx.textBaseline='middle';
+      ctx.fillText('\u26A1 Generate Insight',CX(),by+bh/2);
+      ctx.restore();
+    }
+
+    function drawShockwave(t){
+      if(t<2.2||t>3.4)return;
+      const p=clamp((t-2.2)/0.9,0,1);
+      const maxR=Math.min(cv.width,cv.height)*0.4;
+      const r=p*maxR;
+      const a=(1-p)*0.3;
+      if(a<0.005)return;
+      ctx.save();
+      ctx.beginPath();ctx.arc(CX(),CY(),r,0,Math.PI*2);
+      ctx.strokeStyle=`rgba(${T2[0]},${T2[1]},${T2[2]},${a})`;
+      ctx.lineWidth=2*(1-p);
+      ctx.stroke();
+      ctx.restore();
+    }
+
+    function drawFlash(t){
+      const peak=Math.max(0,1-Math.abs(t-2.4)/0.4)*0.3;
+      if(peak<0.005)return;
+      const g=ctx.createRadialGradient(CX(),CY(),0,CX(),CY(),60+peak*100);
+      g.addColorStop(0,`rgba(${T2[0]},${T2[1]},${T2[2]},${peak})`);
+      g.addColorStop(0.4,`rgba(${T[0]},${T[1]},${T[2]},${peak*0.3})`);
+      g.addColorStop(1,`rgba(${T[0]},${T[1]},${T[2]},0)`);
+      ctx.fillStyle=g;ctx.fillRect(0,0,cv.width,cv.height);
+    }
+
+    /* ── NETWORK (static structure) ── */
+    const SCAN_START=3.4, SCAN_INT=0.3;
+    const scanTexts=['Pulling support tickets...','Scanning helpdesk threads...','Cross-referencing release logs...','Analyzing user sessions...','Correlating behavior patterns...'];
+    const resultLines=['Root cause: v4.1 checkout flow change broke mobile UX','Affected: 68% of negative tickets mention "checkout"','Recommendation: Revert checkout.js to v4.0.3, notify affected users'];
+
+    function sourceGeom(i,cx,cy,ringR,orbR){
+      const angle=(i/N)*Math.PI*2-Math.PI/2;
+      const sx=cx+Math.cos(angle)*ringR, sy=cy+Math.sin(angle)*ringR;
+      const perp=i%2===0?1:-1;
+      const mag=ringR*(0.3+0.12*(i%3));
+      const midX=(sx+cx)/2, midY=(sy+cy)/2;
+      const dx=cx-sx, dy=cy-sy, len=Math.sqrt(dx*dx+dy*dy)||1;
+      const cpx=midX+(-dy/len)*mag*perp, cpy=midY+(dx/len)*mag*perp;
+      const dist=Math.sqrt((cx-sx)**2+(cy-sy)**2)||1;
+      const stopFrac=Math.max(0,1-(orbR*1.1)/dist);
+      return{sx,sy,cpx,cpy,angle,stopFrac};
+    }
+
+    function drawNetwork(t){
+      if(t<2.9)return;
+      const fi=clamp((t-2.9)/0.7,0,1);
+      const fadeOut=t>5.5?clamp((t-5.5)/0.8,0,1):0;
+      const a=easeOut5(fi)*(1-fadeOut);
+      if(a<0.01)return;
+      const cx=CX(),cy=CY();
+      const ringR=Math.min(cv.width,cv.height)*0.26;
+      const orbR=Math.min(cv.width,cv.height)*0.04;
+
+      /* center ambient glow */
+      const ag=ctx.createRadialGradient(cx,cy,0,cx,cy,orbR*3.5);
+      ag.addColorStop(0,`rgba(${T[0]},${T[1]},${T[2]},${a*0.08})`);
+      ag.addColorStop(1,`rgba(${T[0]},${T[1]},${T[2]},0)`);
+      ctx.fillStyle=ag;ctx.fillRect(0,0,cv.width,cv.height);
+
+      /* center orb — pulses when a source particle arrives */
+      let orbBoost=0;
+      SOURCES.forEach((_,i)=>{
+        const lt=t-SCAN_START-i*SCAN_INT;
+        if(lt>0.35&&lt<0.55) orbBoost=Math.max(orbBoost,1-Math.abs(lt-0.45)/0.1);
+      });
+      /* convergence pulse boost */
+      const convT=t-4.9;
+      if(convT>0&&convT<0.5) orbBoost=Math.max(orbBoost,clamp(convT/0.2,0,1)*(1-clamp((convT-0.3)/0.2,0,1)));
+      const orbScale=1+orbBoost*0.5;
+      const orbAlpha=a*(0.15+orbBoost*0.6);
+
+      const mg=ctx.createRadialGradient(cx,cy,0,cx,cy,orbR*1.8*orbScale);
+      mg.addColorStop(0,`rgba(${T2[0]},${T2[1]},${T2[2]},${orbAlpha*0.6})`);
+      mg.addColorStop(0.6,`rgba(${T[0]},${T[1]},${T[2]},${orbAlpha*0.2})`);
+      mg.addColorStop(1,`rgba(${T[0]},${T[1]},${T[2]},0)`);
+      ctx.beginPath();ctx.arc(cx,cy,orbR*1.8*orbScale,0,Math.PI*2);ctx.fillStyle=mg;ctx.fill();
+
+      const ig=ctx.createRadialGradient(cx,cy,0,cx,cy,orbR*orbScale);
+      ig.addColorStop(0,`rgba(255,255,255,${orbAlpha*0.7})`);
+      ig.addColorStop(0.35,`rgba(${T3[0]},${T3[1]},${T3[2]},${orbAlpha*0.5})`);
+      ig.addColorStop(0.7,`rgba(${T2[0]},${T2[1]},${T2[2]},${orbAlpha*0.2})`);
+      ig.addColorStop(1,`rgba(${T[0]},${T[1]},${T[2]},0)`);
+      ctx.beginPath();ctx.arc(cx,cy,orbR*orbScale,0,Math.PI*2);ctx.fillStyle=ig;ctx.fill();
+
+      /* ring */
+      ctx.beginPath();ctx.arc(cx,cy,ringR,0,Math.PI*2);
+      ctx.strokeStyle=`rgba(${T[0]},${T[1]},${T[2]},${a*0.08})`;ctx.lineWidth=0.7;ctx.stroke();
+
+      /* nodes + curves */
+      SOURCES.forEach((s,i)=>{
+        const delay=i/N*0.5;
+        const na=clamp((fi-delay)/0.4,0,1);
+        if(na<0.01)return;
+        const nodeA=a*easeOut3(na);
+        const g=sourceGeom(i,cx,cy,ringR,orbR);
+        const ep=bezier(g.sx,g.sy,g.cpx,g.cpy,cx,cy,g.stopFrac);
+
+        /* per-source brightness: idle → scanning → done */
+        const lt=t-SCAN_START-i*SCAN_INT;
+        const scanning=lt>=0&&lt<SCAN_INT;
+        const done=lt>=SCAN_INT;
+        const curveBright=done?0.18:(scanning?0.35:0.06);
+        const nodeBright=done?0.95:(scanning?1.0:0.6);
+        const nodeSize=scanning?4.5:3.5;
+
+        /* curve */
+        ctx.beginPath();ctx.moveTo(g.sx,g.sy);ctx.quadraticCurveTo(g.cpx,g.cpy,ep.x,ep.y);
+        ctx.strokeStyle=`rgba(${T[0]},${T[1]},${T[2]},${nodeA*curveBright})`;ctx.lineWidth=1;ctx.stroke();
+
+        /* node dot */
+        const dotColor=done?'34,197,94':`${T2[0]},${T2[1]},${T2[2]}`;
+        ctx.beginPath();ctx.arc(g.sx,g.sy,nodeSize,0,Math.PI*2);
+        ctx.fillStyle=`rgba(${dotColor},${nodeA*nodeBright})`;
+        ctx.shadowColor=`rgba(${dotColor},.6)`;ctx.shadowBlur=scanning?12:6;
+        ctx.fill();ctx.shadowBlur=0;
+
+        /* label */
+        const labelR=ringR+32;
+        const lx=cx+Math.cos(g.angle)*labelR,ly=cy+Math.sin(g.angle)*labelR;
+        ctx.save();ctx.globalAlpha=nodeA*(scanning?0.95:done?0.7:0.5);
+        ctx.font=`500 ${Math.min(12,cv.width*.012)}px 'Geist Mono',monospace`;
+        ctx.fillStyle=scanning?`rgba(${T2[0]},${T2[1]},${T2[2]},1)`:`rgba(${T[0]},${T[1]},${T[2]},1)`;
+        ctx.textAlign='center';ctx.textBaseline='middle';
+        ctx.fillText(s.name,lx,ly);
+        ctx.restore();
+      });
+    }
+
+    /* ── SEQUENTIAL SCAN (particles + text) ── */
+    function drawSequentialScan(t){
+      if(t<SCAN_START)return;
+      const cx=CX(),cy=CY();
+      const ringR=Math.min(cv.width,cv.height)*0.26;
+      const orbR=Math.min(cv.width,cv.height)*0.04;
+      const fadeOut=t>5.5?clamp((t-5.5)/0.8,0,1):0;
+      const baseA=1-fadeOut;
+      if(baseA<0.01)return;
+
+      SOURCES.forEach((s,i)=>{
+        const lt=t-SCAN_START-i*SCAN_INT;
+        if(lt<0||lt>SCAN_INT)return;
+        const g=sourceGeom(i,cx,cy,ringR,orbR);
+
+        /* Pull particle: source → center (0.1–0.45) */
+        const pullP=clamp((lt-0.1)/0.35,0,1);
+        if(pullP>0&&pullP<1){
+          const pt=bezier(g.sx,g.sy,g.cpx,g.cpy,cx,cy,pullP*g.stopFrac);
+          const pA=Math.sin(pullP*Math.PI)*baseA;
+          ctx.beginPath();ctx.arc(pt.x,pt.y,3,0,Math.PI*2);
+          ctx.fillStyle=`rgba(${T2[0]},${T2[1]},${T2[2]},${pA})`;
+          ctx.shadowColor=`rgba(${T2[0]},${T2[1]},${T2[2]},.9)`;ctx.shadowBlur=14;
+          ctx.fill();ctx.shadowBlur=0;
+          /* trail */
+          const trailLen=0.12;
+          for(let tr=1;tr<=4;tr++){
+            const tp=Math.max(0,pullP-tr*trailLen*0.25);
+            const tpt=bezier(g.sx,g.sy,g.cpx,g.cpy,cx,cy,tp*g.stopFrac);
+            ctx.beginPath();ctx.arc(tpt.x,tpt.y,2-tr*0.3,0,Math.PI*2);
+            ctx.fillStyle=`rgba(${T2[0]},${T2[1]},${T2[2]},${pA*0.3*(1-tr/5)})`;
+            ctx.fill();
+          }
+        }
+
+        /* Return particle: center → source (0.45–0.7) */
+        const retP=clamp((lt-0.45)/0.25,0,1);
+        if(retP>0&&retP<1){
+          const rFrac=(1-retP)*g.stopFrac;
+          const pt=bezier(g.sx,g.sy,g.cpx,g.cpy,cx,cy,rFrac);
+          const rA=Math.sin(retP*Math.PI)*baseA;
+          ctx.beginPath();ctx.arc(pt.x,pt.y,2.5,0,Math.PI*2);
+          ctx.fillStyle=`rgba(${T3[0]},${T3[1]},${T3[2]},${rA})`;
+          ctx.shadowColor=`rgba(${T3[0]},${T3[1]},${T3[2]},.8)`;ctx.shadowBlur=12;
+          ctx.fill();ctx.shadowBlur=0;
+        }
+      });
+
+      /* Analysis text — one per active source */
+      const textY=cy+cv.height*0.22;
+      ctx.save();
+      SOURCES.forEach((s,i)=>{
+        const lt=t-SCAN_START-i*SCAN_INT;
+        if(lt<0)return;
+        const textA=clamp(lt/0.2,0,1)*(1-clamp((lt-SCAN_INT+0.15)/0.15,0,1))*baseA;
+        if(textA<0.01)return;
+        const chars=Math.floor(clamp(lt/0.035,0,scanTexts[i].length));
+        ctx.globalAlpha=textA;
+        ctx.font=`400 ${Math.min(12,cv.width*.012)}px 'Geist Mono',monospace`;
+        ctx.fillStyle=`rgba(${T[0]},${T[1]},${T[2]},0.6)`;
+        ctx.textAlign='center';ctx.textBaseline='middle';
+        ctx.fillText(scanTexts[i].substring(0,chars),cx,textY);
+      });
+      ctx.restore();
+    }
+
+    /* ── CONVERGENCE PULSE ── */
+    function drawConvergence(t){
+      if(t<4.9||t>6.5)return;
+      const ct=t-4.9;
+      const cx=CX(),cy=CY();
+      const ringR=Math.min(cv.width,cv.height)*0.26;
+      const orbR=Math.min(cv.width,cv.height)*0.04;
+      const fadeOut=ct>0.5?clamp((ct-0.5)/0.5,0,1):0;
+      const a=(1-fadeOut);
+
+      /* all sources send simultaneous final pulse */
+      const pulseP=clamp(ct/0.35,0,1);
+      if(pulseP<1){
+        SOURCES.forEach((s,i)=>{
+          const g=sourceGeom(i,cx,cy,ringR,orbR);
+          const pt=bezier(g.sx,g.sy,g.cpx,g.cpy,cx,cy,pulseP*g.stopFrac);
+          const pA=Math.sin(pulseP*Math.PI)*a;
+          ctx.beginPath();ctx.arc(pt.x,pt.y,3.5,0,Math.PI*2);
+          ctx.fillStyle=`rgba(${T3[0]},${T3[1]},${T3[2]},${pA})`;
+          ctx.shadowColor=`rgba(${T2[0]},${T2[1]},${T2[2]},.9)`;ctx.shadowBlur=16;
+          ctx.fill();ctx.shadowBlur=0;
+
+          /* brighten all curves */
+          const ep=bezier(g.sx,g.sy,g.cpx,g.cpy,cx,cy,g.stopFrac);
+          ctx.beginPath();ctx.moveTo(g.sx,g.sy);ctx.quadraticCurveTo(g.cpx,g.cpy,ep.x,ep.y);
+          ctx.strokeStyle=`rgba(${T2[0]},${T2[1]},${T2[2]},${pA*0.4})`;ctx.lineWidth=1.5;ctx.stroke();
+        });
+      }
+
+      /* "Root cause identified" text */
+      const textA=clamp((ct-0.2)/0.3,0,1)*a;
+      if(textA>0.01){
+        const fullText='Root cause identified \u2713';
+        const chars=Math.floor(clamp((ct-0.2)/0.04,0,fullText.length));
+        ctx.save();ctx.globalAlpha=textA;
+        ctx.font=`500 ${Math.min(13,cv.width*.013)}px 'Geist Mono',monospace`;
+        ctx.fillStyle=`rgba(${T2[0]},${T2[1]},${T2[2]},0.9)`;
+        ctx.textAlign='center';ctx.textBaseline='middle';
+        ctx.fillText(fullText.substring(0,chars),cx,cy+cv.height*0.22);
+        ctx.restore();
+      }
+    }
+
+    /* ── RESULTS REVEAL ── */
+    function drawResults(t){
+      if(t<5.5||t>8.5)return;
+      const rt=t-5.5;
+      const cx=CX(),cy=CY();
+      const fadeOut=rt>2.5?clamp((rt-2.5)/0.6,0,1):0;
+      const a=(1-fadeOut);
+      if(a<0.01)return;
+
+      ctx.save();
+      resultLines.forEach((line,i)=>{
+        const lt=rt-i*0.4;
+        if(lt<0)return;
+        const lineA=clamp(lt/0.25,0,1)*a;
+        const chars=Math.floor(clamp(lt/0.008,0,line.length));
+        const yOff=cy+30+i*26;
+        ctx.globalAlpha=lineA;
+        ctx.font=`400 ${Math.min(13,cv.width*.013)}px 'Geist Mono',monospace`;
+        ctx.fillStyle=i===0?`rgba(${T2[0]},${T2[1]},${T2[2]},0.9)`
+          :i===2?`rgba(34,197,94,0.8)`
+          :`rgba(${T[0]},${T[1]},${T[2]},0.6)`;
+        ctx.textAlign='center';ctx.textBaseline='middle';
+        ctx.fillText(line.substring(0,chars),cx,yOff);
+      });
+      ctx.restore();
+    }
+
+    function loop(ts){
+      if(!startTime)startTime=ts;
+      const t=(ts-startTime)/1000;
+      ctx.clearRect(0,0,cv.width,cv.height);
+      drawFlash(t);
+      drawFragments(t);
+      drawQuestion(t);
+      drawTrigger(t);
+      drawShockwave(t);
+      drawNetwork(t);
+      drawSequentialScan(t);
+      drawConvergence(t);
+      drawResults(t);
+      if(t < 8.5) raf=requestAnimationFrame(loop);
+      else ctx.clearRect(0,0,cv.width,cv.height);
+    }
+    raf=requestAnimationFrame(loop);
+    return()=>{cancelAnimationFrame(raf);window.removeEventListener('resize',resize);};
+  },[]);
+  return <canvas ref={cvRef} style={{position:'absolute',inset:0,width:'100%',height:'100%'}}/>;
+}
+
+
+/* ── HERO ── */
+function Hero() {
+  const [vis, setVis] = useState(false);
+  useEffect(() => { const id = setTimeout(() => setVis(true), 7200); return () => clearTimeout(id); }, []);
+  return (
+    <section style={{position:'relative',height:'100vh',minHeight:'700px',display:'flex',alignItems:'center',justifyContent:'center',overflow:'hidden'}}>
+      <div style={{position:'absolute',inset:0,opacity:vis?0:1,transition:'opacity 1.2s ease',pointerEvents:'none'}}><HeroCanvas /></div>
+      <div style={{position:'absolute',inset:0,background:'radial-gradient(ellipse 80% 70% at 50% 40%, rgba(60,20,120,.12) 0%, transparent 70%)',pointerEvents:'none'}}/>
+      <div style={{position:'relative',zIndex:2,textAlign:'center',maxWidth:'800px',padding:'0 24px',opacity:vis?1:0,transform:vis?'translateY(0)':'translateY(20px)',transition:'opacity .9s ease, transform .9s ease'}}>
+        <h1 style={{fontSize:'clamp(36px,5vw,64px)',fontWeight:500,letterSpacing:'-.03em',lineHeight:1.15,marginBottom:'20px'}}>
+          Your data shows what.<br/>
+          <span style={{color:'#0EC4C1'}}>Insightis shows why.</span>
+        </h1>
+        <p style={{fontSize:'clamp(16px,1.2vw,18px)',color:'rgba(255,255,255,.8)',maxWidth:'580px',margin:'0 auto 32px',lineHeight:1.65}}>
+          One click turns any answer into a deep-dive. Insightis scans every connected source, finds root causes, and surfaces the patterns you'd miss.
+        </p>
+        <div style={{display:'flex',gap:'12px',justifyContent:'center',flexWrap:'wrap',marginBottom:'28px'}}>
+          <a href="#" style={{display:'inline-flex',alignItems:'center',gap:'8px',padding:'12px 28px',background:'linear-gradient(135deg,#09A09D,#07807E)',color:'#fff',borderRadius:'999px',fontSize:'14px',fontWeight:500,textDecoration:'none',boxShadow:'0 0 20px rgba(9,160,157,.3)',transition:'transform .15s',fontFamily:'Geist,sans-serif'}}>Start for Free</a>
+          <a href="#" style={{display:'inline-flex',alignItems:'center',gap:'8px',padding:'12px 28px',border:'1px solid rgba(255,255,255,.1)',color:'#C0D4DC',borderRadius:'999px',fontSize:'14px',fontWeight:500,textDecoration:'none',transition:'all .15s',fontFamily:'Geist,sans-serif'}}>See how it works</a>
+        </div>
+        <div style={{display:'flex',gap:'24px',justifyContent:'center',flexWrap:'wrap'}}>
+          {['\u2713 Root-cause analysis','\u2713 Cross-source correlation','\u2713 Actionable recommendations'].map(t => (
+            <span key={t} style={{fontSize:'12px',color:'#7FA0AC',fontFamily:'Geist Mono,monospace'}}>{t}</span>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+
+/* ── HOW INSIGHTS WORK ── */
+function HowInsightsWork() {
+  const steps = [
+    {n:'01',title:'Ask any question',desc:'Start with any business question in AI Chat. Get your quick, factual answer grounded in real data \u2014 MRR, churn, CAC, anything.',mono:'"What\'s our churn rate?" \u2192 2.1% in March',icon:<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0EC4C1" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>},
+    {n:'02',title:'Click Generate Insight',desc:'When the surface answer isn\'t enough, hit Generate Insight. The engine scans every connected data source \u2014 Stripe, HubSpot, your warehouse, everything.',mono:'Scanning Stripe + HubSpot + PostgreSQL...',icon:<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0EC4C1" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>},
+    {n:'03',title:'Get the full picture',desc:'Receive a detailed root-cause analysis with contributing factors, correlations across data sources, trend context, and concrete recommendations.',mono:'Root cause \u2192 3 churned Starter accounts',icon:<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0EC4C1" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"/></svg>},
+  ];
+  return (
+    <section style={{padding:'100px 0',background:'linear-gradient(180deg,#0A0E13 0%,#0D1117 100%)'}}>
+      <div style={{maxWidth:'1280px',margin:'0 auto',padding:'0 24px'}}>
+        <div style={{textAlign:'center',marginBottom:'56px'}}>
+          <div style={{display:'inline-flex',alignItems:'center',gap:5,padding:'4px 12px',background:'rgba(9,160,157,.08)',border:'1px solid rgba(9,160,157,.2)',borderRadius:'999px',marginBottom:'14px'}}>
+            <span style={{color:'#09A09D',fontSize:'12px'}}>{"\u2726"}</span>
+            <span style={{fontSize:'10px',fontWeight:600,letterSpacing:'.12em',textTransform:'uppercase',color:'#09A09D',fontFamily:'Geist Mono,monospace'}}>How it works</span>
+          </div>
+          <h2 style={{fontSize:'clamp(28px,4vw,44px)',fontWeight:500,color:'#fff',letterSpacing:'-.03em',marginBottom:'12px'}}>From question to root cause in seconds</h2>
+          <p style={{fontSize:'16px',color:'rgba(255,255,255,.5)',maxWidth:'460px',margin:'0 auto',lineHeight:1.65}}>Three steps. One click. Complete understanding.</p>
+        </div>
+        <div data-steps-grid style={{display:'grid',gridTemplateColumns:'repeat(3,1fr)',gap:'16px'}}>
+          {steps.map((s,i)=>(
+            <div key={i} style={{background:'rgba(13,17,23,.6)',border:'1px solid rgba(255,255,255,.06)',borderRadius:'16px',padding:'28px',position:'relative',overflow:'hidden',transition:'all .2s',display:'flex',flexDirection:'column'}} onMouseEnter={e=>{e.currentTarget.style.borderColor='rgba(9,160,157,.25)';e.currentTarget.style.background='rgba(9,160,157,.04)'}} onMouseLeave={e=>{e.currentTarget.style.borderColor='rgba(255,255,255,.06)';e.currentTarget.style.background='rgba(13,17,23,.6)'}}>
+              <div style={{position:'absolute',top:0,left:0,right:0,height:'1px',background:'linear-gradient(90deg,transparent,rgba(9,160,157,.2),transparent)'}}/>
+              <div style={{display:'flex',alignItems:'center',gap:'12px',marginBottom:'16px'}}>
+                <div style={{width:'36px',height:'36px',borderRadius:'10px',background:'rgba(9,160,157,.08)',border:'1px solid rgba(9,160,157,.2)',display:'flex',alignItems:'center',justifyContent:'center'}}>{s.icon}</div>
+                <span style={{fontSize:'11px',fontFamily:'Geist Mono,monospace',color:'rgba(9,160,157,.5)',fontWeight:500}}>{s.n}</span>
+              </div>
+              <h3 style={{fontSize:'17px',fontWeight:600,color:'#E8F2F5',marginBottom:'8px'}}>{s.title}</h3>
+              <p style={{fontSize:'14px',color:'#7FA0AC',lineHeight:1.65,flex:1}}>{s.desc}</p>
+              <div style={{background:'rgba(0,0,0,.3)',borderRadius:'8px',padding:'10px 14px',marginTop:'14px'}}>
+                <span style={{fontSize:'12px',fontFamily:'Geist Mono,monospace',color:'#6E8D9A',fontStyle:'italic'}}>{s.mono}</span>
+              </div>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+
+/* ── INSIGHT DEMO DATA ── */
+const INSIGHT_TABS = [
+  {
+    label:'MRR drop',desc:'Why did MRR drop last week?',
+    question:'Why did MRR drop last week?',
+    shortAnswer:'MRR dropped by $1,240 last week, mainly from 3 churned Starter accounts.',
+    insight:{
+      rootCause:'All 3 churned accounts came from paid ad campaigns (not organic), averaged only 4.2 logins in their last 30 days, and none completed the onboarding wizard. This matches the churn profile of 78% of lost Starter accounts this quarter.',
+      chartType:'horizontalBar',
+      chartData:[{label:'Trial expiry',value:740,display:'-$740'},{label:'Downgrade',value:260,display:'-$260'},{label:'Low engagement',value:240,display:'-$240'}],
+      recommendation:'Trigger a re-engagement sequence for accounts with < 5 logins in their last 14 days. Estimated save: $2.1K/month.',
+    }
+  },
+  {
+    label:'Best CAC channel',desc:'Which channel has the best CAC?',
+    question:'Which channel has the best CAC?',
+    shortAnswer:'Organic search has your lowest CAC at $180 \u2014 2.4\u00d7 better than paid social ($430).',
+    insight:{
+      rootCause:'Organic\'s CAC advantage compounds over time. Content-attributed signups show 34% higher 6-month retention, meaning effective CAC including churn is $127 for organic vs. $612 for paid social. The January blog series on \'RevOps benchmarks\' alone drove 42 trial signups.',
+      chartType:'horizontalBar',
+      chartData:[{label:'Organic',value:180,display:'$180',color:'#0EC4C1'},{label:'Referral',value:210,display:'$210',color:'#09A09D'},{label:'Content',value:245,display:'$245',color:'#818CF8'},{label:'LinkedIn',value:430,display:'$430',color:'#FBBF24'},{label:'Google Ads',value:520,display:'$520',color:'#F87171'}],
+      recommendation:'Double down on SEO pillar content targeting \'RevOps\' and \'BizOps\' keywords. Shift 20% of paid social budget to content production.',
+    }
+  },
+  {
+    label:'NRR this quarter',desc:'What\'s our NRR this quarter?',
+    question:'What\'s our NRR this quarter?',
+    shortAnswer:'Net Revenue Retention is 113% this quarter, up from 108% last quarter.',
+    insight:{
+      rootCause:'Expansion revenue is driven by Mid-Market accounts (NRR 124%) upgrading from Starter to Pro after hitting the 3-seat threshold. Enterprise NRR is lagging at 98% due to two non-renewals worth $22K ARR \u2014 both cited missing SSO support.',
+      chartType:'pie',
+      chartData:[{label:'Mid-Market 124%',value:124},{label:'SMB 98%',value:98,color:'#F87171'},{label:'Enterprise 107%',value:107,color:'#818CF8'}],
+      recommendation:'Prioritize SSO feature for Enterprise retention. Target the 14 Mid-Market accounts approaching the 3-seat threshold for proactive upgrade outreach.',
+    }
+  },
+  {
+    label:'Onboarding',desc:'Onboarding completion this week?',
+    question:'How many users completed onboarding this week?',
+    shortAnswer:'312 users completed onboarding this week, up 18% from last week.',
+    insight:{
+      rootCause:'Step 3 (Connect Data Source) remains the biggest drop-off at 31% abandonment, primarily on mobile. The new \'connect later\' skip option reduced step-3 abandonment by 8pp this week. Users who connect a source on day 1 reach first insight in 1.8 days vs. 9.4 days for those who defer.',
+      chartType:'treemap',
+      chartData:[{label:'Step 3 Connect Source',value:31,display:'31%'},{label:'Step 5 Invite Team',value:14,display:'14%'},{label:'Step 4 First Query',value:11,display:'11%'},{label:'Step 2 Profile',value:6,display:'6%'},{label:'Step 1 Verify',value:4,display:'4%'}],
+      recommendation:'Add an in-app prompt encouraging data source connection within the first session. Gate the welcome email sequence on connection status.',
+    }
+  },
+  {
+    label:'Anomalies',desc:'Anomalies in yesterday\'s data?',
+    question:'Are there anomalies in yesterday\'s data?',
+    shortAnswer:'3 anomalies detected. checkout_complete events dropped 41% between 14:00\u201316:00 UTC.',
+    insight:{
+      rootCause:'The checkout_complete drop correlates with a Stripe webhook delivery delay (incident #4721). The delay started at 13:47 UTC when Stripe\'s webhook queue backed up due to a batch charge operation. All events were backfilled by 18:30 UTC. No actual revenue impact.',
+      chartType:'line',
+      chartPoints:[120,115,118,122,125,130,128,72,68,75,110,125,128,130],
+      chartLabels:['08:00','09:00','10:00','11:00','12:00','13:00','13:30','14:00','14:30','15:00','16:00','17:00','18:00','19:00'],
+      recommendation:'Add automated alerting for checkout_complete drops exceeding 2\u03c3 within any 2-hour window. Stagger enterprise batch billing to off-peak hours.',
+    }
+  },
+];
+
+
+/* ── INSIGHT DEMO ── */
+function InsightDemo() {
+  const [active, setActive] = useState(0);
+  const [phases, setPhases] = useState({0:'insight',1:'insight',2:'insight',3:'insight',4:'insight'});
+
+  const handleTab = (i) => { setActive(i); };
+  const phase = phases[active] || 'insight';
+
+  const handleGenerate = () => {
+    setPhases(p => ({...p, [active]: 'loading'}));
+    setTimeout(() => {
+      setPhases(p => ({...p, [active]: 'insight'}));
+    }, 1500);
+  };
+
+  const tab = INSIGHT_TABS[active];
+  const ins = tab.insight;
+
+  const renderChart = () => {
+    if(ins.chartType === 'horizontalBar') return <HorizontalBarChart bars={ins.chartData}/>;
+    if(ins.chartType === 'pie') return <PieChart slices={ins.chartData}/>;
+    if(ins.chartType === 'treemap') return <TreemapChart items={ins.chartData}/>;
+    if(ins.chartType === 'line') return <LineChart points={tab.insight.chartPoints} labels={tab.insight.chartLabels}/>;
+    return null;
+  };
+
+  return (
+    <section style={{padding:'80px 0 100px',background:'linear-gradient(180deg,#0D1117 0%,#101620 100%)'}}>
+      <div style={{maxWidth:'1280px',margin:'0 auto',padding:'0 24px'}}>
+        <div style={{textAlign:'center',marginBottom:'40px'}}>
+          <div style={{display:'inline-flex',alignItems:'center',gap:5,padding:'4px 12px',background:'rgba(9,160,157,.08)',border:'1px solid rgba(9,160,157,.2)',borderRadius:'999px',marginBottom:'14px'}}>
+            <span style={{color:'#09A09D',fontSize:'12px'}}>{"\u2726"}</span>
+            <span style={{fontSize:'10px',fontWeight:600,letterSpacing:'.12em',textTransform:'uppercase',color:'#09A09D',fontFamily:'Geist Mono,monospace'}}>See it in action</span>
+          </div>
+          <h2 style={{fontSize:'clamp(28px,4vw,44px)',fontWeight:500,color:'#fff',letterSpacing:'-.03em',marginBottom:'12px'}}>From surface answer to deep insight</h2>
+          <p style={{fontSize:'16px',color:'rgba(255,255,255,.5)',maxWidth:'500px',margin:'0 auto',lineHeight:1.65}}>Select any question to see the full root cause analysis.</p>
+        </div>
+
+        <div className="sc-wrap">
+          <div className="sc-tabs">
+            {INSIGHT_TABS.map((t,i) => (
+              <div key={i} className={`sc-tab ${i===active?'active':''}`} onClick={() => handleTab(i)}>
+                <div className="sc-tab-label">{t.label}</div>
+                <div className="sc-tab-desc">{t.desc}</div>
+              </div>
+            ))}
+          </div>
+
+          <div className="sc-panel-wrap" key={active} style={{animation:'slideUp .25s ease'}}>
+            <div style={{width:'100%',display:'flex',flexDirection:'column',gap:'10px',padding:'20px 24px 20px'}}>
+
+              {/* User question */}
+              <div style={{alignSelf:'flex-end',maxWidth:'80%',background:'rgba(9,160,157,.15)',border:'1px solid rgba(9,160,157,.3)',borderRadius:'16px 16px 4px 16px',padding:'10px 16px',fontSize:'13.5px',color:'#E8F2F5',lineHeight:1.5}}>
+                {tab.question}
+              </div>
+
+              {/* AI short answer */}
+              <div style={{alignSelf:'flex-start',maxWidth:'95%',background:'rgba(255,255,255,.03)',border:'1px solid rgba(255,255,255,.07)',borderRadius:'4px 16px 16px 16px',padding:'14px 16px'}}>
+                <div style={{display:'flex',alignItems:'center',gap:'6px',marginBottom:'8px'}}>
+                  <div style={{width:'18px',height:'18px',borderRadius:'5px',background:'rgba(9,160,157,.12)',border:'1px solid rgba(9,160,157,.25)',display:'flex',alignItems:'center',justifyContent:'center'}}>
+                    <svg width="8" height="8" viewBox="0 0 16 16" fill="none"><path d="M8 1l2 5h5l-4 3 1.5 5L8 11l-4.5 3L5 9 1 6h5z" stroke="#0EC4C1" strokeWidth="1.2" strokeLinejoin="round"/></svg>
+                  </div>
+                  <span style={{fontSize:'11px',fontFamily:'Geist Mono,monospace',color:'#0EC4C1',fontWeight:500}}>Insightis</span>
+                  <div style={{marginLeft:'auto',fontSize:'10px',fontFamily:'Geist Mono,monospace',color:'#6E8D9A',display:'flex',alignItems:'center',gap:4}}>
+                    <div style={{width:5,height:5,borderRadius:'50%',background:'#22C55E',boxShadow:'0 0 5px #22C55E'}}/>live data
+                  </div>
+                </div>
+                <p style={{fontSize:'13.5px',color:'#C0D4DC',lineHeight:1.6}}>{tab.shortAnswer}</p>
+              </div>
+
+              {/* Insight card — always shown */}
+              <div style={{display:'flex',flexDirection:'column',width:'100%',background:'rgba(9,160,157,.04)',border:'1px solid rgba(9,160,157,.2)',borderRadius:'12px',padding:'16px 18px',animation:'slideUp .3s ease both',position:'relative',overflow:'hidden'}}>
+                <div style={{position:'absolute',top:0,left:0,right:0,height:'1px',background:'linear-gradient(90deg,transparent,rgba(9,160,157,.6),transparent)'}}/>
+                <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'10px'}}>
+                  <div style={{width:8,height:8,borderRadius:'50%',background:'#22C55E',boxShadow:'0 0 6px #22C55E'}}/>
+                  <span style={{fontSize:'12px',fontWeight:600,color:'#E8F2F5'}}>Root Cause Analysis</span>
+                  <span style={{fontSize:'10px',fontFamily:'Geist Mono,monospace',color:'#22C55E',background:'rgba(34,197,94,.1)',padding:'2px 8px',borderRadius:'4px'}}>complete</span>
+                </div>
+                <p style={{fontSize:'12.5px',color:'#C0D4DC',lineHeight:1.6,marginBottom:'10px'}}>{ins.rootCause}</p>
+                <div style={{marginBottom:'4px'}}>
+                  <span style={{fontSize:'10px',fontWeight:600,color:'#7FA0AC',textTransform:'uppercase',letterSpacing:'.08em'}}>Contributing Factors</span>
+                </div>
+                {renderChart()}
+                <div style={{display:'flex',alignItems:'flex-start',gap:'8px',background:'rgba(9,160,157,.05)',border:'1px solid rgba(9,160,157,.15)',borderRadius:'10px',padding:'10px 14px',marginTop:'10px'}}>
+                  <span style={{color:'#09A09D',fontSize:'12px',flexShrink:0}}>{"\u2192"}</span>
+                  <span style={{fontSize:'12px',color:'#7FA0AC',lineHeight:1.5}}>{ins.recommendation}</span>
+                </div>
+
+                {/* Action buttons */}
+                <div style={{display:'flex',alignItems:'center',gap:'8px',marginTop:'10px',flexWrap:'wrap'}}>
+                  <button style={{display:'flex',alignItems:'center',gap:'6px',background:'rgba(34,197,94,.1)',border:'1px solid rgba(34,197,94,.3)',borderRadius:'8px',padding:'8px 16px',cursor:'pointer',fontFamily:'Geist,sans-serif',fontSize:'12px',fontWeight:500,color:'#22C55E',transition:'all .15s'}}>
+                    <svg width="12" height="12" viewBox="0 0 16 16" fill="none"><path d="M13 4L6.5 11 3 7.5" stroke="#22C55E" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                    Accept Insight
+                  </button>
+                  <button style={{display:'flex',alignItems:'center',gap:'6px',background:'rgba(255,255,255,.04)',border:'1px solid rgba(255,255,255,.1)',borderRadius:'8px',padding:'8px 16px',cursor:'pointer',fontFamily:'Geist,sans-serif',fontSize:'12px',fontWeight:500,color:'rgba(255,255,255,.45)',transition:'all .15s'}}>
+                    <svg width="11" height="11" viewBox="0 0 16 16" fill="none"><path d="M12 4L4 12M4 4l8 8" stroke="currentColor" strokeWidth="2" strokeLinecap="round"/></svg>
+                    Decline
+                  </button>
+                  <div style={{marginLeft:'auto',display:'flex',alignItems:'center',gap:'8px'}}>
+                    <button style={{display:'flex',alignItems:'center',gap:'6px',background:'rgba(255,255,255,.04)',border:'1px solid rgba(255,255,255,.1)',borderRadius:'8px',padding:'8px 14px',cursor:'pointer',fontFamily:'Geist,sans-serif',fontSize:'12px',fontWeight:500,color:'rgba(255,255,255,.55)',transition:'all .15s'}}>
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><rect x="2" y="7" width="20" height="14" rx="2" stroke="currentColor" strokeWidth="1.7"/><path d="M16 7V5a2 2 0 0 0-2-2h-4a2 2 0 0 0-2 2v2" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"/><path d="M12 12v4M10 14h4" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round"/></svg>
+                      Send to Jira
+                    </button>
+                    <button style={{display:'flex',alignItems:'center',gap:'6px',background:'rgba(255,255,255,.04)',border:'1px solid rgba(255,255,255,.1)',borderRadius:'8px',padding:'8px 14px',cursor:'pointer',fontFamily:'Geist,sans-serif',fontSize:'12px',fontWeight:500,color:'rgba(255,255,255,.55)',transition:'all .15s'}}>
+                      <svg width="13" height="13" viewBox="0 0 24 24" fill="none"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" strokeLinejoin="round"/></svg>
+                      Send to Slack
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+
+/* ── ENGINE CAPABILITIES ── */
+function EngineCapabilities() {
+  const caps = [
+    {title:'Cross-Source Analysis',desc:'Insights Engine doesn\'t look at one database \u2014 it correlates data across every connected source simultaneously. Stripe revenue meets HubSpot pipeline meets product usage data.',icon:<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0EC4C1" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M12.83 2.18a2 2 0 0 0-1.66 0L2.6 6.08a1 1 0 0 0 0 1.83l8.58 3.91a2 2 0 0 0 1.66 0l8.58-3.9a1 1 0 0 0 0-1.83z"/><path d="M2 12l8.58 3.91a2 2 0 0 0 1.66 0L21 12"/><path d="M2 17l8.58 3.91a2 2 0 0 0 1.66 0L21 17"/></svg>},
+    {title:'Root-Cause Detection',desc:'Goes beyond \'what happened\' to identify WHY. Uses statistical analysis, trend detection, and pattern matching across historical data to surface true causes.',icon:<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0EC4C1" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><circle cx="11" cy="11" r="8"/><path d="M21 21l-4.35-4.35"/><path d="M11 8v6"/><path d="M8 11h6"/></svg>},
+    {title:'Actionable Recommendations',desc:'Every insight ends with a concrete next step. Not vague suggestions \u2014 specific actions with estimated impact based on your actual data.',icon:<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0EC4C1" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M13 2L3 14h9l-1 8 10-12h-9l1-8z"/></svg>},
+    {title:'Continuous Context',desc:'Insights Engine learns from every analysis. It remembers past findings, tracks whether recommendations were effective, and refines future analysis based on outcomes.',icon:<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#0EC4C1" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round"><path d="M23 4v6h-6"/><path d="M1 20v-6h6"/><path d="M3.51 9a9 9 0 0 1 14.85-3.36L23 10M1 14l4.64 4.36A9 9 0 0 0 20.49 15"/></svg>},
+  ];
+  return (
+    <section style={{padding:'100px 0',background:'linear-gradient(180deg,#101620 0%,#0A0E13 100%)'}}>
+      <div style={{maxWidth:'1280px',margin:'0 auto',padding:'0 24px'}}>
+        <div style={{textAlign:'center',marginBottom:'56px'}}>
+          <div style={{display:'inline-flex',alignItems:'center',gap:5,padding:'4px 12px',background:'rgba(9,160,157,.08)',border:'1px solid rgba(9,160,157,.2)',borderRadius:'999px',marginBottom:'14px'}}>
+            <span style={{color:'#09A09D',fontSize:'12px'}}>{"\u2726"}</span>
+            <span style={{fontSize:'10px',fontWeight:600,letterSpacing:'.12em',textTransform:'uppercase',color:'#09A09D',fontFamily:'Geist Mono,monospace'}}>Capabilities</span>
+          </div>
+          <h2 style={{fontSize:'clamp(28px,4vw,44px)',fontWeight:500,color:'#fff',letterSpacing:'-.03em',marginBottom:'12px'}}>Built for depth, not just speed</h2>
+          <p style={{fontSize:'16px',color:'rgba(255,255,255,.5)',maxWidth:'460px',margin:'0 auto',lineHeight:1.65}}>Every analysis goes beyond the surface to deliver understanding you can act on.</p>
+        </div>
+        <div data-caps-grid style={{display:'grid',gridTemplateColumns:'repeat(2,1fr)',gap:'16px'}}>
+          {caps.map((c,i) => (
+            <div key={i} style={{background:'rgba(13,17,23,.6)',border:'1px solid rgba(255,255,255,.06)',borderRadius:'16px',padding:'28px',position:'relative',overflow:'hidden',transition:'all .2s'}} onMouseEnter={e=>{e.currentTarget.style.borderColor='rgba(9,160,157,.25)';e.currentTarget.style.background='rgba(9,160,157,.04)'}} onMouseLeave={e=>{e.currentTarget.style.borderColor='rgba(255,255,255,.06)';e.currentTarget.style.background='rgba(13,17,23,.6)'}}>
+              <div style={{position:'absolute',top:0,left:0,right:0,height:'1px',background:'linear-gradient(90deg,transparent,rgba(9,160,157,.2),transparent)'}}/>
+              <div style={{width:'40px',height:'40px',borderRadius:'10px',background:'rgba(9,160,157,.08)',border:'1px solid rgba(9,160,157,.2)',display:'flex',alignItems:'center',justifyContent:'center',marginBottom:'16px'}}>{c.icon}</div>
+              <h3 style={{fontSize:'17px',fontWeight:600,color:'#E8F2F5',marginBottom:'8px'}}>{c.title}</h3>
+              <p style={{fontSize:'14px',color:'#7FA0AC',lineHeight:1.65}}>{c.desc}</p>
+            </div>
+          ))}
+        </div>
+      </div>
+    </section>
+  );
+}
+
+
+/* ── CHAT VS INSIGHT ── */
+function ChatVsInsight() {
+  return (
+    <section style={{padding:'100px 0',background:'linear-gradient(180deg,#0A0E13 0%,#0D1117 100%)'}}>
+      <div style={{maxWidth:'1280px',margin:'0 auto',padding:'0 24px'}}>
+        <div style={{textAlign:'center',marginBottom:'52px'}}>
+          <div style={{display:'inline-flex',alignItems:'center',gap:5,padding:'4px 12px',background:'rgba(9,160,157,.08)',border:'1px solid rgba(9,160,157,.2)',borderRadius:'999px',marginBottom:'14px'}}>
+            <span style={{color:'#09A09D',fontSize:'12px'}}>{"\u2726"}</span>
+            <span style={{fontSize:'10px',fontWeight:600,letterSpacing:'.12em',textTransform:'uppercase',color:'#09A09D',fontFamily:'Geist Mono,monospace'}}>The difference</span>
+          </div>
+          <h2 style={{fontSize:'clamp(28px,4vw,44px)',fontWeight:500,color:'#fff',letterSpacing:'-.03em',marginBottom:'12px'}}>Answer vs. understanding</h2>
+          <p style={{fontSize:'16px',color:'rgba(255,255,255,.5)',maxWidth:'440px',margin:'0 auto',lineHeight:1.65}}>AI Chat tells you what. Insights Engine tells you why.</p>
+        </div>
+
+        <div data-compare-grid style={{display:'grid',gridTemplateColumns:'1fr 1fr',gap:'12px'}}>
+          {/* AI Chat */}
+          <div style={{background:'rgba(248,113,113,.04)',border:'1px solid rgba(248,113,113,.15)',borderRadius:'16px',padding:'28px'}}>
+            <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'20px'}}>
+              <div style={{width:'8px',height:'8px',borderRadius:'50%',background:'#F87171'}}/>
+              <span style={{fontSize:'13px',fontWeight:600,color:'#F87171'}}>AI Chat Answer</span>
+            </div>
+            <div style={{background:'rgba(0,0,0,.3)',borderRadius:'10px',padding:'16px',marginBottom:'12px',fontFamily:'Geist Mono,monospace'}}>
+              <div style={{fontSize:'11px',color:'#6E8D9A',marginBottom:'8px'}}>{"\u2192"} "Why did MRR drop last week?"</div>
+              <div style={{fontSize:'12.5px',color:'#505068',lineHeight:1.7}}>
+                Your MRR dropped by <span style={{color:'#F87171'}}>$1,240</span> last week, mainly from 3 churned Starter accounts. The primary reason was plan downgrade after trial expiry.
+              </div>
+            </div>
+            <p style={{fontSize:'12px',color:'rgba(248,113,113,.6)',fontStyle:'italic'}}>Fast, factual, accurate. But it stops at the surface.</p>
+          </div>
+
+          {/* Insights Engine */}
+          <div style={{background:'rgba(9,160,157,.05)',border:'1px solid rgba(9,160,157,.25)',borderRadius:'16px',padding:'28px',position:'relative'}}>
+            <div style={{position:'absolute',top:0,left:0,right:0,height:'1px',background:'linear-gradient(90deg,transparent,rgba(9,160,157,.6),transparent)',borderRadius:'16px 16px 0 0'}}/>
+            <div style={{display:'flex',alignItems:'center',gap:'8px',marginBottom:'20px'}}>
+              <div style={{width:'8px',height:'8px',borderRadius:'50%',background:'#0EC4C1',boxShadow:'0 0 8px #0EC4C1'}}/>
+              <span style={{fontSize:'13px',fontWeight:600,color:'#0EC4C1'}}>Insights Engine Analysis</span>
+            </div>
+            <div style={{background:'rgba(0,0,0,.3)',borderRadius:'10px',padding:'16px',marginBottom:'12px',fontFamily:'Geist Mono,monospace'}}>
+              <div style={{fontSize:'11px',color:'#6E8D9A',marginBottom:'8px'}}>{"\u2192"} "Why did MRR drop last week?" + {"\u26A1"} Generate Insight</div>
+              <div style={{fontSize:'12.5px',color:'#C0D4DC',lineHeight:1.7}}>
+                <div style={{marginBottom:'8px'}}><span style={{color:'#0EC4C1',fontWeight:600}}>ROOT CAUSE:</span> All 3 churned accounts originated from the Feb LinkedIn campaign (not organic), averaged 4.2 logins in 30 days, and skipped onboarding. This pattern matches 78% of churned Starter accounts.</div>
+                <div style={{marginBottom:'8px'}}><span style={{color:'#0EC4C1',fontWeight:600}}>CORRELATION:</span> Feb LinkedIn campaign accounts churn at 2.3{"\u00d7"} the rate of organic signups.</div>
+                <div style={{color:'#09A09D'}}>{"\u2192"} Trigger re-engagement for {'<'}5 login accounts</div>
+              </div>
+            </div>
+            <p style={{fontSize:'12px',color:'rgba(9,160,157,.6)',fontStyle:'italic'}}>Goes deeper. Connects dots across sources. Tells you what to do.</p>
+          </div>
+        </div>
+
+        <div style={{textAlign:'center',marginTop:'36px'}}>
+          <div style={{display:'inline-flex',alignItems:'center',gap:'12px'}}>
+            <span style={{fontSize:'40px',fontWeight:500,color:'#0EC4C1',fontFamily:'Geist Mono,monospace',lineHeight:1,flexShrink:0}}>10{"\u00d7"}</span>
+            <span style={{fontSize:'15px',color:'#7FA0AC'}}>deeper analysis than a surface-level answer, in seconds instead of days.</span>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+
+/* ── BOTTOM CTA ── */
+function BottomCTA() {
+  return (
+    <section style={{paddingTop:'32px',paddingBottom:'64px',position:'relative'}}>
+      <div style={{maxWidth:'1280px',margin:'0 auto',padding:'0 24px'}}>
+        <div style={{position:'relative',borderRadius:'16px',border:'1px solid rgba(30,30,48,1)',padding:'32px 48px',overflow:'hidden',display:'flex',flexDirection:'row',alignItems:'center',justifyContent:'space-between',gap:'24px',flexWrap:'wrap',background:'linear-gradient(135deg,rgba(18,18,31,.95) 0%,rgba(13,13,26,.98) 50%,rgba(18,18,31,.95) 100%)'}}>
+          <div style={{position:'absolute',top:0,left:0,right:0,height:'1px',background:'linear-gradient(90deg,transparent,rgba(7,128,126,.3),transparent)'}}/>
+          <h3 style={{fontSize:'clamp(22px,3vw,30px)',fontWeight:500,color:'#fff',letterSpacing:'-.03em',lineHeight:1.2,flexShrink:0}}>
+            Stop guessing. Start <span style={{color:'#07807E'}}>understanding.</span>
+          </h3>
+          <div style={{display:'flex',alignItems:'center',width:'100%',maxWidth:'420px',background:'#0D0D1A',border:'1px solid rgba(46,46,64,1)',borderRadius:'12px',overflow:'hidden',flex:'1 1 340px'}}>
+            <input type="text" placeholder="What do you want to understand about your data?" style={{flex:1,background:'transparent',fontSize:'14px',color:'#fff',padding:'12px 16px',outline:'none',border:'none',fontFamily:'Geist,sans-serif',minWidth:0}}/>
+            <button style={{display:'inline-flex',alignItems:'center',gap:'8px',padding:'10px 20px',margin:'4px',fontSize:'13px',fontWeight:600,color:'#fff',background:'linear-gradient(135deg,#07807E,#09A09D)',borderRadius:'8px',border:'none',cursor:'pointer',whiteSpace:'nowrap',flexShrink:0,fontFamily:'Geist,sans-serif'}}>
+              Generate Insight
+              <svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round"><path d="M5 12h14"/><path d="M12 5l7 7-7 7"/></svg>
+            </button>
+          </div>
+        </div>
+      </div>
+    </section>
+  );
+}
+
+
+/* ── FOOTER ── */
+function Footer() {
+  const linkUrls = {
+    'AI Chat': 'AI Chat.html',
+    'Integrations': 'Integrations.html',
+    'Insights Engine': 'Insights Engine.html',
+    'Semantic Layer': 'Semantic Layer.html',
+    'Reports': 'Reports.html',
+    'Memory & Storage': 'Memory & Storage.html',
+  };
+  return (
+    <footer className="pt-16 pb-8 border-t border-[#1E1E30]">
+      <div className="max-w-7xl mx-auto px-6">
+        <div className="flex flex-col md:flex-row gap-10 md:gap-16 mb-14 items-start">
+          <div className="shrink-0 md:max-w-[220px]">
+            <a href="../index.html" className="flex items-center gap-2.5 mb-4">
+              <svg width="111" height="26" viewBox="0 0 111 26" fill="none" xmlns="http://www.w3.org/2000/svg" className="h-7"><g clipPath="url(#clip0_footer)"><path d="M25.4928 10.4151L21.6736 12.7512L25.4928 15.0767L12.7464 22.8371L0 15.0767L3.81921 12.7512L0 10.4151L5.73562 6.92339L7.64785 8.08747L3.82392 10.4151L12.7464 15.8473L21.6689 10.4151L17.845 8.08747L19.7572 6.92339L25.4928 10.4151ZM12.7464 18.1755L5.72881 13.9031L3.8234 15.0767L12.7464 20.5095L21.6694 15.0767L19.7635 13.9031L12.7464 18.1755ZM17.845 10.4209L12.7464 13.525L7.64785 10.4209L9.56426 9.25421L12.7464 11.1915L15.9286 9.25421L17.845 10.4209ZM17.845 5.75931L12.7464 8.86335L7.64785 5.75931L12.7464 2.65527L17.845 5.75931ZM11.4718 5.75878L12.7464 6.53519L14.0211 5.75878L12.7464 4.9829L11.4718 5.75878Z" fill="#1498B9"/><path d="M33.2746 17.5261V5.60823H35.5859V17.5261H33.2746Z" fill="white"/><path d="M38.2797 17.5261V8.0821H40.1758L40.1216 10.9713H40.4466C40.6152 10.261 40.8379 9.67717 41.1148 9.21971C41.4037 8.76226 41.7708 8.41917 42.2163 8.19044C42.6617 7.96171 43.1793 7.84735 43.7692 7.84735C44.8406 7.84735 45.6532 8.22656 46.207 8.98497C46.7728 9.74338 47.0557 10.9171 47.0557 12.5062V17.5261H44.7624V12.7409C44.7624 11.7177 44.6059 10.9713 44.2929 10.5018C43.9919 10.0203 43.5405 9.77949 42.9386 9.77949C42.433 9.77949 42.0056 9.94201 41.6565 10.267C41.3074 10.58 41.0365 11.0014 40.8439 11.5311C40.6633 12.0487 40.567 12.6205 40.555 13.2465V17.5261H38.2797Z" fill="white"/><path d="M53.1255 17.7609C52.4875 17.7609 51.9096 17.6947 51.392 17.5622C50.8864 17.4419 50.453 17.2673 50.0918 17.0386C49.7307 16.7978 49.4418 16.5149 49.2251 16.1899C49.0084 15.8528 48.876 15.4796 48.8278 15.0703L50.6155 14.4022C50.6396 14.7152 50.76 14.9981 50.9767 15.2509C51.1933 15.4917 51.4943 15.6843 51.8795 15.8287C52.2647 15.9732 52.7282 16.0454 53.2699 16.0454C53.8719 16.0454 54.3353 15.9551 54.6604 15.7746C54.9974 15.5819 55.166 15.3111 55.166 14.962C55.166 14.7092 55.0757 14.5105 54.8951 14.3661C54.7145 14.2096 54.4497 14.0832 54.1006 13.9869C53.7635 13.8785 53.3542 13.7762 52.8727 13.6799C52.4273 13.5836 51.9758 13.4752 51.5184 13.3549C51.073 13.2224 50.6576 13.0539 50.2724 12.8493C49.8992 12.6326 49.5922 12.3557 49.3515 12.0186C49.1228 11.6695 49.0084 11.2301 49.0084 10.7004C49.0084 10.1226 49.1589 9.623 49.4598 9.20166C49.7728 8.78032 50.2182 8.44926 50.7961 8.2085C51.386 7.96773 52.0962 7.84735 52.9269 7.84735C53.7093 7.84735 54.3835 7.9557 54.9493 8.17238C55.5271 8.38907 55.9966 8.70207 56.3578 9.11137C56.7189 9.50863 56.9476 9.98415 57.0439 10.5379L55.166 11.1338C55.1299 10.7967 55.0155 10.5138 54.8229 10.2851C54.6303 10.0443 54.3714 9.86376 54.0464 9.74338C53.7214 9.623 53.3422 9.56281 52.9088 9.56281C52.355 9.56281 51.9217 9.65911 51.6087 9.85172C51.2957 10.0443 51.1392 10.3032 51.1392 10.6282C51.1392 10.893 51.2355 11.1037 51.4281 11.2602C51.6327 11.4167 51.9096 11.5431 52.2587 11.6394C52.6199 11.7357 53.0292 11.832 53.4866 11.9283C53.9682 12.0246 54.4316 12.139 54.8771 12.2714C55.3345 12.3918 55.7438 12.5543 56.105 12.759C56.4661 12.9636 56.755 13.2345 56.9717 13.5716C57.1884 13.8966 57.2967 14.3179 57.2967 14.8356C57.2967 15.4616 57.1282 15.9973 56.7911 16.4427C56.4541 16.8761 55.9725 17.2071 55.3465 17.4358C54.7326 17.6525 53.9922 17.7609 53.1255 17.7609Z" fill="white"/><path d="M59.2115 17.5261V8.0821H61.4868V17.5261H59.2115ZM60.3492 6.60139C59.8917 6.60139 59.5366 6.50508 59.2838 6.31247C59.043 6.10782 58.9226 5.8189 58.9226 5.44571C58.9226 5.07253 59.043 4.78963 59.2838 4.59702C59.5366 4.39236 59.8917 4.29004 60.3492 4.29004C60.8307 4.29004 61.1918 4.38635 61.4326 4.57896C61.6734 4.77157 61.7937 5.06049 61.7937 5.44571C61.7937 5.8189 61.6673 6.10782 61.4145 6.31247C61.1738 6.50508 60.8186 6.60139 60.3492 6.60139Z" fill="white"/><path d="M67.709 20.7765C66.6857 20.7765 65.843 20.6982 65.1809 20.5417C64.5309 20.3852 64.0493 20.1505 63.7363 19.8375C63.4233 19.5245 63.2668 19.1393 63.2668 18.6818C63.2668 18.128 63.4835 17.6766 63.9169 17.3275C64.3623 16.9663 65.0184 16.7436 65.8852 16.6594V16.2982C65.2351 16.3103 64.7415 16.2441 64.4045 16.0996C64.0674 15.9431 63.8988 15.6963 63.8988 15.3592C63.8988 15.0342 64.0614 14.7453 64.3864 14.4925C64.7235 14.2397 65.2772 14.029 66.0477 13.8605V13.4993C65.3133 13.4632 64.7415 13.2345 64.3322 12.8131C63.9229 12.3798 63.7183 11.82 63.7183 11.1338C63.7183 10.5198 63.8868 9.97813 64.2239 9.50863C64.561 9.03914 65.0545 8.67197 65.7046 8.40713C66.3667 8.13025 67.1672 7.99181 68.1062 7.99181H72.7831V9.79755L69.8217 9.36417V9.76144C70.5681 9.88182 71.1158 10.0925 71.4649 10.3934C71.8261 10.6944 72.0066 11.1037 72.0066 11.6214C72.0066 12.1149 71.8501 12.5543 71.5371 12.9395C71.2241 13.3127 70.7667 13.6077 70.1648 13.8244C69.5749 14.029 68.8586 14.1313 68.0159 14.1313C67.8594 14.1313 67.6909 14.1253 67.5103 14.1133C67.3298 14.1012 67.0469 14.0711 66.6616 14.023C66.4088 14.2036 66.2042 14.3661 66.0477 14.5105C65.8912 14.643 65.8129 14.7694 65.8129 14.8897C65.8129 14.986 65.8731 15.0703 65.9935 15.1425C66.1139 15.2027 66.2704 15.2449 66.463 15.2689C66.6556 15.293 66.8422 15.3051 67.0228 15.3051H69.5328C69.7735 15.3051 70.0805 15.3231 70.4537 15.3592C70.8389 15.3954 71.2181 15.4917 71.5913 15.6482C71.9765 15.8047 72.2955 16.0514 72.5484 16.3885C72.8132 16.7256 72.9456 17.2011 72.9456 17.815C72.9456 18.5012 72.747 19.061 72.3497 19.4944C71.9645 19.9398 71.3806 20.2648 70.5982 20.4695C69.8277 20.6741 68.8646 20.7765 67.709 20.7765ZM67.9076 18.9346C68.654 18.9346 69.2499 18.8925 69.6953 18.8082C70.1407 18.7239 70.4597 18.5855 70.6523 18.3929C70.8449 18.2123 70.9412 17.9776 70.9412 17.6886C70.9412 17.4238 70.8811 17.2192 70.7607 17.0747C70.6403 16.9182 70.4838 16.8098 70.2912 16.7497C70.1106 16.6895 69.924 16.6534 69.7314 16.6413C69.5388 16.6293 69.3763 16.6233 69.2438 16.6233H67.0228C66.4449 16.7075 66.0356 16.87 65.7949 17.1108C65.5662 17.3516 65.4518 17.6164 65.4518 17.9053C65.4518 18.1943 65.5481 18.4109 65.7407 18.5554C65.9333 18.7119 66.2102 18.8142 66.5713 18.8624C66.9445 18.9105 67.3899 18.9346 67.9076 18.9346ZM67.9618 12.8854C68.5878 12.8854 69.0633 12.7409 69.3883 12.452C69.7133 12.151 69.8759 11.7598 69.8759 11.2783C69.8759 10.7606 69.7073 10.3393 69.3702 10.0142C69.0452 9.67717 68.5697 9.50863 67.9437 9.50863C67.3177 9.50863 66.8302 9.67115 66.4811 9.99618C66.144 10.3212 65.9755 10.7365 65.9755 11.2421C65.9755 11.5672 66.0477 11.8561 66.1921 12.1089C66.3486 12.3497 66.5713 12.5423 66.8603 12.6867C67.1612 12.8192 67.5284 12.8854 67.9618 12.8854Z" fill="white"/><path d="M74.7825 17.5261V4.70536H77.0758V7.64872C77.0758 7.90152 77.0638 8.16035 77.0397 8.42519C77.0277 8.69003 77.0036 8.96089 76.9675 9.23777C76.9314 9.51465 76.8892 9.79153 76.8411 10.0684C76.805 10.3453 76.7628 10.6222 76.7147 10.8991H77.0939C77.2624 10.249 77.4791 9.70125 77.7439 9.25583C78.0088 8.79837 78.3459 8.44926 78.7552 8.2085C79.1765 7.96773 79.6881 7.84735 80.29 7.84735C81.3855 7.84735 82.2041 8.23258 82.7459 9.00303C83.2876 9.76144 83.5584 10.9171 83.5584 12.47V17.5261H81.2651V12.7951C81.2651 11.7598 81.1087 10.9954 80.7957 10.5018C80.4947 10.0082 80.0372 9.76144 79.4233 9.76144C78.9177 9.76144 78.4963 9.91793 78.1593 10.2309C77.8222 10.5319 77.5634 10.9352 77.3828 11.4408C77.2022 11.9464 77.0939 12.5182 77.0578 13.1562V17.5261H74.7825Z" fill="white"/><path d="M89.2495 17.7428C88.2503 17.7428 87.516 17.478 87.0465 16.9483C86.577 16.4066 86.3422 15.5699 86.3422 14.4383V9.9059H84.9518L84.9879 8.10015H85.9089C86.258 8.10015 86.5168 8.04598 86.6853 7.93764C86.8539 7.82929 86.9562 7.63668 86.9923 7.3598L87.209 5.98744H88.5272V8.0821H91.0191V9.97813H88.5272V14.348C88.5272 14.7934 88.6295 15.1185 88.8342 15.3231C89.0509 15.5278 89.3699 15.6301 89.7912 15.6301C90.0199 15.6301 90.2426 15.606 90.4593 15.5579C90.6881 15.4977 90.8987 15.4014 91.0913 15.2689V17.4358C90.7182 17.5562 90.3751 17.6345 90.0621 17.6706C89.7611 17.7187 89.4903 17.7428 89.2495 17.7428Z" fill="white"/><path d="M92.9634 17.5261V8.0821H95.2386V17.5261H92.9634ZM94.101 6.60139C93.6436 6.60139 93.2884 6.50508 93.0356 6.31247C92.7949 6.10782 92.6745 5.8189 92.6745 5.44571C92.6745 5.07253 92.7949 4.78963 93.0356 4.59702C93.2884 4.39236 93.6436 4.29004 94.101 4.29004C94.5825 4.29004 94.9437 4.38635 95.1845 4.57896C95.4252 4.77157 95.5456 5.06049 95.5456 5.44571C95.5456 5.8189 95.4192 6.10782 95.1664 6.31247C94.9256 6.50508 94.5705 6.60139 94.101 6.60139Z" fill="white"/><path d="M101.461 17.7609C100.823 17.7609 100.245 17.6947 99.7273 17.5622C99.2217 17.4419 98.7883 17.2673 98.4272 17.0386C98.066 16.7978 97.7771 16.5149 97.5604 16.1899C97.3437 15.8528 97.2113 15.4796 97.1632 15.0703L98.9508 14.4022C98.9749 14.7152 99.0953 14.9981 99.312 15.2509C99.5287 15.4917 99.8296 15.6843 100.215 15.8287C100.6 15.9732 101.064 16.0454 101.605 16.0454C102.207 16.0454 102.671 15.9551 102.996 15.7746C103.333 15.5819 103.501 15.3111 103.501 14.962C103.501 14.7092 103.411 14.5105 103.23 14.3661C103.05 14.2096 102.785 14.0832 102.436 13.9869C102.099 13.8785 101.69 13.7762 101.208 13.6799C100.763 13.5836 100.311 13.4752 99.8537 13.3549C99.4083 13.2224 98.993 13.0539 98.6077 12.8493C98.2346 12.6326 97.9276 12.3557 97.6868 12.0186C97.4581 11.6695 97.3437 11.2301 97.3437 10.7004C97.3437 10.1226 97.4942 9.623 97.7952 9.20166C98.1082 8.78032 98.5536 8.44926 99.1314 8.2085C99.7213 7.96773 100.432 7.84735 101.262 7.84735C102.045 7.84735 102.719 7.9557 103.285 8.17238C103.862 8.38907 104.332 8.70207 104.693 9.11137C105.054 9.50863 105.283 9.98415 105.379 10.5379L103.501 11.1338C103.465 10.7967 103.351 10.5138 103.158 10.2851C102.966 10.0443 102.707 9.86376 102.382 9.74338C102.057 9.623 101.678 9.56281 101.244 9.56281C100.69 9.56281 100.257 9.65911 99.944 9.85172C99.631 10.0443 99.4745 10.3032 99.4745 10.6282C99.4745 10.893 99.5708 11.1037 99.7634 11.2602C99.9681 11.4167 100.245 11.5431 100.594 11.6394C100.955 11.7357 101.365 11.832 101.822 11.9283C102.303 12.0246 102.767 12.139 103.212 12.2714C103.67 12.3918 104.079 12.5543 104.44 12.759C104.801 12.9636 105.09 13.2345 105.307 13.5716C105.524 13.8966 105.632 14.3179 105.632 14.8356C105.632 15.4616 105.464 15.9973 105.126 16.4427C104.789 16.8761 104.308 17.2071 103.682 17.4358C103.068 17.6525 102.328 17.7609 101.461 17.7609Z" fill="white"/></g><defs><clipPath id="clip0_footer"><rect width="111" height="25.4928" fill="white"/></clipPath></defs></svg>
+            </a>
+            <p className="text-xs font-medium text-[#09A09D] uppercase tracking-wider mb-2">AI Analytics Workspace for instant insights</p>
+            <p className="text-sm text-[#7878A8] leading-relaxed">Every data has an insight. We help you find them, without the complexity.</p>
+          </div>
+          <div className="md:ml-auto grid grid-cols-2 gap-8 md:flex md:flex-row md:gap-16">
+            <div>
+              <h4 className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#7878A8] mb-4 whitespace-nowrap">Platform</h4>
+              <ul className="flex flex-col gap-2.5">
+                {['AI Chat', 'Integrations', 'Insights Engine', 'Semantic Layer', 'Reports', 'Memory & Storage'].map(link => (
+                  <li key={link}><a href={linkUrls[link] || '#'} className="text-sm text-[#A0A0B8] hover:text-white transition-colors whitespace-nowrap">{link}</a></li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#7878A8] mb-4 whitespace-nowrap">Solutions</h4>
+              <ul className="flex flex-col gap-2.5">
+                {['For RevOps & BizOps', 'For Founders & CEOs', 'For Marketing Teams', 'For Product Teams', 'For Data & Analytics Teams', 'For Operations & Finance'].map(link => (
+                  <li key={link}><a href="#" className="text-sm text-[#A0A0B8] hover:text-white transition-colors whitespace-nowrap">{link}</a></li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#7878A8] mb-4 whitespace-nowrap">Resources</h4>
+              <ul className="flex flex-col gap-2.5">
+                {['Documentation', 'Video Tutorials', 'Blog', 'Contact Support', 'Roadmap', 'AI Connect'].map(link => (
+                  <li key={link}><a href="#" className="text-sm text-[#A0A0B8] hover:text-white transition-colors whitespace-nowrap">{link}</a></li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#7878A8] mb-4 whitespace-nowrap">Company</h4>
+              <ul className="flex flex-col gap-2.5">
+                {[
+                  { label: 'About Insightis', href: '#' },
+                  { label: 'About Devart', href: 'https://www.devart.com/company/' },
+                  { label: 'Careers', href: 'https://www.devart.com/vacancies/' },
+                  { label: 'Contacts', href: '#' },
+                  { label: 'Success Stories', href: '#' },
+                  { label: 'Press & Media', href: '#' },
+                ].map(link => (
+                  <li key={link.label}><a href={link.href} className="text-sm text-[#A0A0B8] hover:text-white transition-colors whitespace-nowrap">{link.label}</a></li>
+                ))}
+              </ul>
+            </div>
+            <div>
+              <h4 className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#7878A8] mb-4 whitespace-nowrap">Legal</h4>
+              <ul className="flex flex-col gap-2.5">
+                {['Privacy', 'Terms', 'Security', 'Cookie Settings'].map(link => (
+                  <li key={link}><a href="#" className="text-sm text-[#A0A0B8] hover:text-white transition-colors whitespace-nowrap">{link}</a></li>
+                ))}
+              </ul>
+            </div>
+          </div>
+        </div>
+        <div className="border-t border-[#1E1E30] pt-6 flex items-center justify-between">
+          <p className="text-xs text-[#7878A8]">&copy; Copyright &copy; Devart 2026</p>
+          <div className="flex items-center gap-4">
+            <a href="https://x.com/Insightisai" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity"><TwitterXIcon size={18} color="#7878A8" /></a>
+            <a href="https://www.tiktok.com/@insightisai" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity"><TikTokIcon size={18} color="#7878A8" /></a>
+            <a href="https://www.youtube.com/@InsightisAI" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity"><YouTubeIcon size={18} color="#7878A8" /></a>
+            <a href="https://www.linkedin.com/company/112025589" target="_blank" rel="noopener noreferrer" className="hover:opacity-80 transition-opacity"><LinkedInIcon size={18} color="#7878A8" /></a>
+          </div>
+        </div>
+      </div>
+    </footer>
+  );
+}
+
+
+/* ── APP ── */
+function App() {
+  return (
+    <div>
+      <Header />
+      <Hero />
+      <HowInsightsWork />
+      <InsightDemo />
+      <EngineCapabilities />
+      <ChatVsInsight />
+      <BottomCTA />
+      <Footer />
+    </div>
+  );
+}
+
+ReactDOM.createRoot(document.getElementById('root')).render(<App />);
+</script>
+</body>
+</html>

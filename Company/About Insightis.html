@@ -511,7 +511,7 @@ function Footer() {
               <h4 className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#7878A8] mb-4 whitespace-nowrap">Resources</h4>
               <ul className="flex flex-col gap-2.5">
                 {['Documentation', 'Video Tutorials', 'Blog', 'Contact Support', 'Roadmap', 'AI Connect'].map(link => (
-                  <li key={link}><a href="#" className="text-sm text-[#A0A0B8] hover:text-white transition-colors whitespace-nowrap">{link}</a></li>
+                  <li key={link}><a href={linkUrls[link] || '#'} className="text-sm text-[#A0A0B8] hover:text-white transition-colors whitespace-nowrap">{link}</a></li>
                 ))}
               </ul>
             </div>

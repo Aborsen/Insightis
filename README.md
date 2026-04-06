@@ -37,7 +37,7 @@ Marketing landing site for **Insightis**, an AI analytics workspace that connect
 |---|---|
 | Documentation | `Resources/Documentation.html` |
 | Blog | `Resources/Blog.html` |
-| Contact Support | `Resources/Contact Support.html` |
+| Support Center| `Resources/Contact Support.html` |
 | AI Connect | `Resources/AI Connect.html` |
 | Video Tutorials | https://www.youtube.com/@InsightisAI |
 

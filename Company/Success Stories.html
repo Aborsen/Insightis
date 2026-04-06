@@ -162,8 +162,8 @@ function Header() {
     'Pricing': '../Pricing.html',
     'Documentation': '../Resources/Documentation.html',
     'Blog': '../Resources/Blog.html',
-    'Contact Support': '../Resources/Contact Support.html',
-    'AI Connect': '../Resources/AI Connect.html',
+    'Support Center': '../Resources/Contact Support.html',
+    'Community': '../Resources/Community.html',
     'About Insightis': '../Company/About Insightis.html',
     'Contacts': '../Company/Contacts.html',
     'Success Stories': '../Company/Success Stories.html',
@@ -204,13 +204,13 @@ function Header() {
       sections: [
         { heading: 'LEARN', items: [
           { label: 'Documentation', desc: 'Setup guides and API reference', icon: 'file' },
-          { label: 'Video Tutorials', desc: 'Step-by-step walkthroughs', icon: 'play' },
+          { label: 'Video Tutorials', desc: 'Step-by-step walkthroughs', icon: 'play', external: true },
           { label: 'Blog', desc: 'Data analytics tips and product updates', icon: 'rss' },
         ]},
         { heading: 'CONNECT', items: [
-          { label: 'Contact Support', desc: 'Get help from our team', icon: 'support' },
+          { label: 'Support Center', desc: 'Get help from our team', icon: 'support' },
           { label: 'Roadmap', desc: 'Follow product development in real time', icon: 'map' },
-          { label: 'AI Connect', desc: 'Connect your insights to any AI system', icon: 'grid' },
+          { label: 'Community', desc: 'Join our community', icon: 'grid' },
         ]},
       ]
     }
@@ -299,7 +299,7 @@ function Header() {
                     <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-[#A0A0B8] mb-4 px-3">{section.heading}</p>
                     <div className="flex flex-col gap-0.5">
                       {section.items.map((item, ii) => (
-                        <a key={ii} href={linkUrls[item.label] || '#'} onClick={() => setActiveDropdown(null)}
+                        <a key={ii} href={linkUrls[item.label] || '#'} {...(item.external ? {target:'_blank', rel:'noopener noreferrer'} : {})} onClick={() => setActiveDropdown(null)}
                           className="flex items-start gap-3 px-3 py-2.5 rounded-xl hover:bg-white/[0.05] transition-colors group">
                           {item.icon && (
                             <div style={{
@@ -316,7 +316,7 @@ function Header() {
                           )}
                           <div className="flex flex-col">
                             <span className="flex items-center gap-2">
-                              <span className="text-sm font-medium text-white group-hover:text-[#0EC4C1] transition-colors">{item.label}</span>
+                              <span className="text-sm font-medium text-white group-hover:text-[#0EC4C1] transition-colors">{item.label}{item.external && <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{width:'10px',height:'10px',marginLeft:'4px',display:'inline',verticalAlign:'middle',opacity:0.5}}><path d="M3.5 2H10V8.5"/><path d="M10 2L2 10"/></svg>}</span>
                               {item.comingSoon && (
                                 <span style={{fontSize:'10px', fontWeight:500, letterSpacing:'0.04em', padding:'1px 6px', borderRadius:'4px', background:'rgba(10,152,150,0.12)', border:'1px solid rgba(10,152,150,0.3)', color:'#0EC4C1', whiteSpace:'nowrap'}}>Coming Soon</span>
                               )}
@@ -369,79 +369,69 @@ function Header() {
 
 /* ── STORIES HERO ── */
 function StoriesHero() {
-  return (
-    <section style={{padding:'120px 0 80px', position:'relative'}}>
-      <div style={{maxWidth:'1280px', margin:'0 auto', padding:'0 24px', textAlign:'center', position:'relative'}}>
-        <div className="fu0" style={{display:'inline-flex', alignItems:'center', gap:5, padding:'4px 12px', background:'rgba(9,160,157,.08)', border:'1px solid rgba(9,160,157,.2)', borderRadius:'999px', marginBottom:'14px'}}>
-          <span style={{color:'#09A09D', fontSize:'12px'}}>&#10022;</span>
-          <span style={{fontSize:'10px', fontWeight:600, letterSpacing:'.12em', textTransform:'uppercase', color:'#09A09D', fontFamily:'Geist Mono,monospace'}}>Success Stories</span>
-        </div>
-        <h1 className="fu1" style={{fontSize:'clamp(32px,5vw,56px)', fontWeight:500, letterSpacing:'-.03em', lineHeight:1.15, marginBottom:'20px'}}>
-          Teams that stopped guessing<br/>
-          <span style={{color:'#0EC4C1'}}>and started knowing.</span>
-        </h1>
-        <p className="fu2" style={{fontSize:'17px', color:'rgba(255,255,255,.5)', maxWidth:'580px', margin:'0 auto', lineHeight:1.65}}>
-          See how companies use Insightis to replace spreadsheet chaos with instant, accurate answers from their real data.
-        </p>
-      </div>
-    </section>
-  );
-}
+  const featuredStories = [
+    {
+      company: 'Meridian Analytics',
+      image: 'https://images.unsplash.com/photo-1522071820081-009f0129c71c?w=600&h=360&fit=crop',
+      quote: '"Insightis increased the speed of development by 50% after switching to AI Chat for data queries..."',
+      product: 'AI Chat',
+      icon: 'chat',
+    },
+    {
+      company: 'Apex Growth Partners',
+      image: 'https://images.unsplash.com/photo-1552664730-d307ca884978?w=600&h=360&fit=crop',
+      quote: '"The simplicity it gives with creating and modifying dashboards and creating reports are fantastic..."',
+      product: 'Reports',
+      icon: 'file',
+    },
+    {
+      company: 'Vantage Data Co.',
+      image: 'https://images.unsplash.com/photo-1600880292203-757bb62b4baf?w=600&h=360&fit=crop',
+      quote: '"It has saved my time, which is money. And now my stakeholders get a better response time from me."',
+      product: 'Insights Engine',
+      icon: 'pulse',
+    },
+  ];
 
-/* ── FEATURED STORY ── */
-function FeaturedStory() {
   return (
-    <section style={{padding:'0 0 80px'}}>
-      <div style={{maxWidth:'1060px', margin:'0 auto', padding:'0 24px'}}>
-        <div style={{background:'rgba(9,160,157,.04)', border:'1px solid rgba(9,160,157,.2)', borderRadius:'16px', padding:'48px', position:'relative', overflow:'hidden'}} className="md:flex-row flex-col" >
-          <div style={{position:'absolute', top:0, left:0, right:0, height:'1px', background:'linear-gradient(90deg,transparent,rgba(9,160,157,.4),transparent)'}}/>
-          <div style={{display:'flex', gap:'40px', flexWrap:'wrap'}}>
-            {/* Left side */}
-            <div style={{flex:'1 1 340px', minWidth:0}}>
-              <div style={{display:'inline-flex', padding:'4px 10px', background:'rgba(255,255,255,.05)', border:'1px solid rgba(255,255,255,.08)', borderRadius:'999px', marginBottom:'20px'}}>
-                <span style={{fontSize:'11px', color:'#7FA0AC', fontFamily:'Geist Mono,monospace'}}>SaaS Company &middot; Series A &middot; 45 employees</span>
-              </div>
-              <p style={{fontSize:'20px', fontWeight:400, color:'#E8F2F5', lineHeight:1.6, fontStyle:'italic', marginBottom:'20px'}}>
-                "We went from spending 3 days building pipeline reports to getting answers in 10 seconds. Insightis replaced our entire BI stack."
-              </p>
-              <div style={{marginBottom:'24px'}}>
-                <span style={{fontSize:'14px', fontWeight:600, color:'#0EC4C1'}}>Sarah Chen</span>
-                <span style={{fontSize:'14px', color:'#7FA0AC'}}>, VP of Revenue Operations</span>
-              </div>
-              <div style={{display:'flex', gap:'24px', flexWrap:'wrap'}}>
-                <div>
-                  <div style={{fontSize:'18px', fontWeight:600, color:'#0EC4C1', fontFamily:'Geist Mono,monospace'}}>3 days &rarr; 10s</div>
-                  <div style={{fontSize:'11px', color:'#7FA0AC', fontFamily:'Geist Mono,monospace', marginTop:'2px'}}>Report turnaround</div>
+    <section style={{padding:'120px 0 0', position:'relative'}}>
+      <div style={{maxWidth:'1280px', margin:'0 auto', padding:'0 24px', position:'relative'}}>
+        {/* Hero heading */}
+        <div style={{maxWidth:'640px', marginBottom:'48px'}}>
+          <h1 className="fu1" style={{fontSize:'clamp(32px,5vw,52px)', fontWeight:500, letterSpacing:'-.03em', lineHeight:1.15, marginBottom:'20px'}}>
+            <span style={{color:'#0EC4C1'}}>100+</span> companies use Insightis to accomplish more
+          </h1>
+          <p className="fu2" style={{fontSize:'16px', color:'rgba(255,255,255,.45)', lineHeight:1.7}}>
+            Read the stories of our customers on how they saved time, became more productive, and transformed the way they work with Insightis.
+          </p>
+        </div>
+
+        {/* Featured success stories */}
+        <div style={{marginBottom:'80px'}}>
+          <h2 className="fu2" style={{fontSize:'22px', fontWeight:500, color:'#E8F2F5', letterSpacing:'-.02em', marginBottom:'28px'}}>Featured success stories</h2>
+          <div style={{display:'grid', gap:'20px'}} className="md:grid-cols-3 grid-cols-1">
+            {featuredStories.map((story, i) => (
+              <div key={i} className={`fu${i+2}`} style={{background:'rgba(255,255,255,.03)', border:'1px solid rgba(255,255,255,.07)', borderRadius:'16px', overflow:'hidden', transition:'all .25s'}}
+                onMouseEnter={e => { e.currentTarget.style.borderColor='rgba(9,160,157,.3)'; e.currentTarget.style.transform='translateY(-2px)'; }}
+                onMouseLeave={e => { e.currentTarget.style.borderColor='rgba(255,255,255,.07)'; e.currentTarget.style.transform='translateY(0)'; }}>
+                {/* Image cover */}
+                <div style={{height:'180px', position:'relative', overflow:'hidden'}}>
+                  <img src={story.image} alt={story.company} style={{width:'100%', height:'100%', objectFit:'cover', display:'block'}} />
                 </div>
-                <div>
-                  <div style={{fontSize:'18px', fontWeight:600, color:'#0EC4C1', fontFamily:'Geist Mono,monospace'}}>3x</div>
-                  <div style={{fontSize:'11px', color:'#7FA0AC', fontFamily:'Geist Mono,monospace', marginTop:'2px'}}>Faster board prep</div>
-                </div>
-                <div>
-                  <div style={{fontSize:'18px', fontWeight:600, color:'#0EC4C1', fontFamily:'Geist Mono,monospace'}}>$0</div>
-                  <div style={{fontSize:'11px', color:'#7FA0AC', fontFamily:'Geist Mono,monospace', marginTop:'2px'}}>BI tool cost</div>
-                </div>
-              </div>
-            </div>
-            {/* Right side - mini chat mock */}
-            <div style={{flex:'0 1 320px', minWidth:'260px'}}>
-              <div style={{background:'rgba(13,17,23,0.9)', border:'1px solid rgba(255,255,255,0.08)', borderRadius:'16px', overflow:'hidden'}}>
-                <div style={{padding:'10px 14px', borderBottom:'1px solid rgba(255,255,255,0.06)', display:'flex', alignItems:'center', gap:'8px'}}>
-                  <div style={{display:'flex', gap:'4px'}}>
-                    {['#FF5F57','#FFBD2E','#28C840'].map((c,i) => (
-                      <div key={i} style={{width:'8px', height:'8px', borderRadius:'50%', background:c, opacity:.6}}/>
-                    ))}
+                {/* Content */}
+                <div style={{padding:'20px'}}>
+                  <h3 style={{fontSize:'15px', fontWeight:600, color:'#E8F2F5', marginBottom:'8px'}}>{story.company}</h3>
+                  <p style={{fontSize:'13px', color:'#7FA0AC', lineHeight:1.65, marginBottom:'16px', fontStyle:'italic'}}>{story.quote}</p>
+                  <div style={{display:'inline-flex', alignItems:'center', gap:'6px', padding:'5px 12px', background:'rgba(9,160,157,.08)', border:'1px solid rgba(9,160,157,.18)', borderRadius:'999px'}}>
+                    <span style={{width:'6px', height:'6px', borderRadius:'50%', background:'#0EC4C1', flexShrink:0}}/>
+                    <span style={{fontSize:'11px', fontWeight:500, color:'#09A09D', fontFamily:'Geist Mono,monospace'}}>{story.product}</span>
                   </div>
-                  <div style={{flex:1, textAlign:'center', fontSize:'10px', color:'#6E8D9A', fontFamily:'Geist Mono,monospace'}}>insightis</div>
-                </div>
-                <div style={{padding:'14px', display:'flex', flexDirection:'column', gap:'10px'}}>
-                  <div className="chat-bubble-user">What's our NRR this quarter?</div>
-                  <div className="chat-bubble-ai">Net Revenue Retention is 113%, up from 108% last quarter.</div>
                 </div>
               </div>
-            </div>
+            ))}
           </div>
         </div>
+
       </div>
     </section>
   );
@@ -450,12 +440,12 @@ function FeaturedStory() {
 /* ── STORY GRID ── */
 function StoryGrid() {
   const stories = [
-    { type: 'B2B SaaS', size: '120 employees', challenge: 'Revenue and marketing teams used different MRR numbers, causing board meeting confusion.', solution: 'Insightis Semantic Layer unified all metric definitions across Stripe, HubSpot, and their data warehouse.', result: '1 source of truth', resultLabel: 'across all teams', team: 'RevOps' },
-    { type: 'E-commerce', size: '30 employees', challenge: 'Manually pulling Shopify + GA4 data into spreadsheets every Monday took the founder 4 hours.', solution: 'Connected both sources to Insightis. Now asks "How did we perform last week?" every Monday morning.', result: '4 hours \u2192 30 seconds', resultLabel: 'weekly reporting', team: 'Founder & CEO' },
-    { type: 'FinTech', size: '200 employees', challenge: 'Data team was overwhelmed with ad-hoc requests from product and marketing.', solution: 'Insightis gave every team self-serve access to certified data. Ad-hoc requests dropped dramatically.', result: '74% fewer', resultLabel: 'analyst tickets', team: 'Data & Analytics' },
-    { type: 'Marketing Agency', size: '15 employees', challenge: 'Client reporting across 8 ad platforms required 2 full days of manual work per month.', solution: 'Connected all ad platforms to Insightis. Generates client-ready answers and exports in minutes.', result: '2 days \u2192 20 minutes', resultLabel: 'client reporting', team: 'Marketing' },
-    { type: 'Health Tech', size: '80 employees', challenge: 'Product team couldn\'t correlate feature usage with retention without filing a data request.', solution: 'Insightis cross-references Mixpanel usage data with Stripe billing. Product team asks questions directly.', result: '3x faster', resultLabel: 'product decisions', team: 'Product Team' },
-    { type: 'Logistics', size: '50 employees', challenge: 'Finance needed real-time burn rate and runway calculations but only got monthly spreadsheet updates.', solution: 'Connected QuickBooks and payroll data. CFO now asks "What\'s our runway?" anytime and gets a live answer.', result: 'Real-time', resultLabel: 'financial visibility', team: 'Ops & Finance' },
+    { type: 'B2B SaaS', size: '120 employees', image: 'https://images.unsplash.com/photo-1556761175-5973dc0f32e7?w=500&h=280&fit=crop', challenge: 'Revenue and marketing teams used different MRR numbers, causing board meeting confusion.', solution: 'Insightis Semantic Layer unified all metric definitions across Stripe, HubSpot, and their data warehouse.', result: '1 source of truth', resultLabel: 'across all teams', team: 'RevOps' },
+    { type: 'E-commerce', size: '30 employees', image: 'https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=500&h=280&fit=crop', challenge: 'Manually pulling Shopify + GA4 data into spreadsheets every Monday took the founder 4 hours.', solution: 'Connected both sources to Insightis. Now asks "How did we perform last week?" every Monday morning.', result: '4 hours \u2192 3 minutes', resultLabel: 'weekly reporting', team: 'Founder & CEO' },
+    { type: 'FinTech', size: '200 employees', image: 'https://images.unsplash.com/photo-1551434678-e076c223a692?w=500&h=280&fit=crop', challenge: 'Data team was overwhelmed with ad-hoc requests from product and marketing.', solution: 'Insightis gave every team self-serve access to certified data. Ad-hoc requests dropped dramatically.', result: '74% fewer', resultLabel: 'analyst tickets', team: 'Data & Analytics' },
+    { type: 'Marketing Agency', size: '15 employees', image: 'https://images.unsplash.com/photo-1542744173-8e7e53415bb0?w=500&h=280&fit=crop', challenge: 'Client reporting across 8 ad platforms required 2 full days of manual work per month.', solution: 'Connected all ad platforms to Insightis. Generates client-ready answers and exports in minutes.', result: '2 days \u2192 20 minutes', resultLabel: 'client reporting', team: 'Marketing' },
+    { type: 'Health Tech', size: '80 employees', image: 'https://images.unsplash.com/photo-1576091160399-112ba8d25d1d?w=500&h=280&fit=crop', challenge: 'Product team couldn\'t correlate feature usage with retention without filing a data request.', solution: 'Insightis cross-references Mixpanel usage data with Stripe billing. Product team asks questions directly.', result: '3x faster', resultLabel: 'product decisions', team: 'Product Team' },
+    { type: 'Logistics', size: '50 employees', image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=500&h=280&fit=crop', challenge: 'Finance needed real-time burn rate and runway calculations but only got monthly spreadsheet updates.', solution: 'Connected QuickBooks and payroll data. CFO now asks "What\'s our runway?" anytime and gets a live answer.', result: 'Real-time', resultLabel: 'financial visibility', team: 'Ops & Finance' },
   ];
 
   return (
@@ -470,9 +460,13 @@ function StoryGrid() {
         </div>
         <div style={{display:'grid', gridTemplateColumns:'repeat(3,1fr)', gap:'16px'}} className="md:grid-cols-3 grid-cols-1">
           {stories.map((s, i) => (
-            <div key={i} style={{background:'rgba(255,255,255,.03)', border:'1px solid rgba(255,255,255,.07)', borderRadius:'16px', padding:'28px', transition:'all .2s'}}
+            <div key={i} style={{background:'rgba(255,255,255,.03)', border:'1px solid rgba(255,255,255,.07)', borderRadius:'16px', overflow:'hidden', transition:'all .2s'}}
               onMouseEnter={e=>e.currentTarget.style.borderColor='rgba(9,160,157,.3)'}
               onMouseLeave={e=>e.currentTarget.style.borderColor='rgba(255,255,255,.07)'}>
+              <div style={{height:'140px', overflow:'hidden'}}>
+                <img src={s.image} alt={s.type} style={{width:'100%', height:'100%', objectFit:'cover', display:'block'}} />
+              </div>
+              <div style={{padding:'28px'}}>
               <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', marginBottom:'16px'}}>
                 <span style={{fontSize:'11px', padding:'3px 10px', background:'rgba(9,160,157,.08)', border:'1px solid rgba(9,160,157,.15)', borderRadius:'999px', color:'#09A09D', fontFamily:'Geist Mono,monospace'}}>{s.type}</span>
                 <span style={{fontSize:'10px', color:'#6E8D9A', fontFamily:'Geist Mono,monospace'}}>{s.size}</span>
@@ -482,6 +476,7 @@ function StoryGrid() {
               <div style={{fontSize:'28px', fontWeight:500, color:'#0EC4C1', fontFamily:'Geist Mono,monospace', marginBottom:'4px'}}>{s.result}</div>
               <div style={{fontSize:'12px', color:'#7FA0AC', fontFamily:'Geist Mono,monospace', marginBottom:'16px'}}>{s.resultLabel}</div>
               <div style={{fontSize:'11px', color:'#6E8D9A', fontFamily:'Geist Mono,monospace', paddingTop:'12px', borderTop:'1px solid rgba(255,255,255,.06)'}}>{s.team}</div>
+              </div>
             </div>
           ))}
         </div>
@@ -491,24 +486,153 @@ function StoryGrid() {
 }
 
 /* ── RESULTS BANNER ── */
-function ResultsBanner() {
-  const stats = [
-    { value: '10x', label: 'Faster time to insight' },
-    { value: '74%', label: 'Fewer ad-hoc data requests' },
-    { value: '3 days \u2192 seconds', label: 'Report turnaround' },
-    { value: '200+', label: 'Data sources supported' },
-  ];
+function useCountUp(target, duration, started) {
+  const [display, setDisplay] = React.useState('0');
+  React.useEffect(() => {
+    if (!started) return;
+    const easeOut = t => 1 - Math.pow(1 - t, 3);
+    const startTime = performance.now();
+    const tick = 16; // ~60fps
+    const id = setInterval(() => {
+      const progress = Math.min((performance.now() - startTime) / duration, 1);
+      setDisplay(String(Math.round(easeOut(progress) * target)));
+      if (progress >= 1) clearInterval(id);
+    }, tick);
+    return () => clearInterval(id);
+  }, [started, target, duration]);
+  return display;
+}
+
+function AnimatedStat({ num, prefix, suffix, label, started, delay }) {
+  const [active, setActive] = React.useState(false);
+  React.useEffect(() => {
+    if (!started) return;
+    const t = setTimeout(() => setActive(true), delay);
+    return () => clearTimeout(t);
+  }, [started, delay]);
+
+  const count = useCountUp(num, 1600, active);
 
   return (
-    <section style={{padding:'48px 0', background:'rgba(9,160,157,.04)', borderTop:'1px solid rgba(9,160,157,.1)', borderBottom:'1px solid rgba(9,160,157,.1)'}}>
-      <div style={{maxWidth:'1280px', margin:'0 auto', padding:'0 24px'}}>
-        <div style={{display:'flex', justifyContent:'center', alignItems:'center', gap:'60px', flexWrap:'wrap'}}>
-          {stats.map((s, i) => (
-            <div key={i} style={{textAlign:'center'}}>
-              <div style={{fontSize:'36px', fontWeight:500, color:'#0EC4C1', fontFamily:'Geist Mono,monospace', marginBottom:'4px'}}>{s.value}</div>
-              <div style={{fontSize:'13px', color:'#7FA0AC'}}>{s.label}</div>
-            </div>
-          ))}
+    <div style={{textAlign:'center', minWidth:'140px'}}>
+      <div style={{
+        height:'64px', display:'flex', alignItems:'center', justifyContent:'center',
+        marginBottom:'8px',
+        transition:'opacity .4s', opacity: active ? 1 : 0,
+      }}>
+        <span style={{
+          fontSize:'clamp(28px,3.5vw,40px)', fontWeight:500, color:'#0EC4C1',
+          fontFamily:'Geist Mono,monospace',
+        }}>{prefix}{count}{suffix}</span>
+      </div>
+      <div style={{fontSize:'13px', color:'#7FA0AC', lineHeight:1.5}}>{label}</div>
+    </div>
+  );
+}
+
+function TextStat({ from, to, label, started, delay }) {
+  const [phase, setPhase] = React.useState(0); // 0=hidden, 1=from shown, 2=to revealed
+  React.useEffect(() => {
+    if (!started) return;
+    const t1 = setTimeout(() => setPhase(1), delay);
+    const t2 = setTimeout(() => setPhase(2), delay + 650);
+    return () => { clearTimeout(t1); clearTimeout(t2); };
+  }, [started, delay]);
+
+  return (
+    <div style={{textAlign:'center', minWidth:'140px'}}>
+      {/* Fixed 64px value area — same as AnimatedStat */}
+      <div style={{
+        height:'64px', display:'flex', flexDirection:'column',
+        alignItems:'center', justifyContent:'center', gap:'2px',
+        marginBottom:'8px',
+      }}>
+        {/* "3 days" — fades in then gets struck through */}
+        <span style={{
+          fontSize:'clamp(16px,2vw,20px)', fontWeight:500,
+          fontFamily:'Geist Mono,monospace',
+          color: phase === 2 ? 'rgba(14,196,193,.35)' : '#0EC4C1',
+          textDecoration: phase === 2 ? 'line-through' : 'none',
+          textDecorationColor: 'rgba(14,196,193,.4)',
+          opacity: phase >= 1 ? 1 : 0,
+          transition:'opacity .35s, color .4s, text-decoration .4s',
+        }}>{from}</span>
+        {/* "→ minutes" — slides up and fades in */}
+        <span style={{
+          fontSize:'clamp(22px,2.8vw,34px)', fontWeight:500,
+          fontFamily:'Geist Mono,monospace', color:'#0EC4C1',
+          display:'inline-flex', alignItems:'center', gap:'6px',
+          opacity: phase === 2 ? 1 : 0,
+          transform: phase === 2 ? 'translateY(0)' : 'translateY(6px)',
+          transition:'opacity .4s, transform .4s',
+        }}>
+          <svg width="13" height="13" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2.5" strokeLinecap="round" strokeLinejoin="round" style={{opacity:.7}}>
+            <path d="M5 12h14"/><path d="M12 5l7 7-7 7"/>
+          </svg>
+          {to}
+        </span>
+      </div>
+      <div style={{fontSize:'13px', color:'#7FA0AC', lineHeight:1.5}}>{label}</div>
+    </div>
+  );
+}
+
+function ResultsBanner() {
+  const sectionRef = React.useRef(null);
+  const [started, setStarted] = React.useState(false);
+
+  React.useEffect(() => {
+    const el = sectionRef.current;
+    if (!el) return;
+
+    function check() {
+      const rect = el.getBoundingClientRect();
+      if (rect.top < window.innerHeight - 60 && rect.bottom > 0) {
+        setStarted(true);
+        cleanup();
+      }
+    }
+
+    let observer;
+    function cleanup() {
+      if (observer) observer.disconnect();
+      window.removeEventListener('scroll', check, true);
+    }
+
+    if ('IntersectionObserver' in window) {
+      observer = new IntersectionObserver(
+        ([entry]) => { if (entry.isIntersecting) { setStarted(true); cleanup(); } },
+        { threshold: 0, rootMargin: '0px 0px -60px 0px' }
+      );
+      observer.observe(el);
+    }
+
+    // Scroll-event fallback (also fires on initial load if already visible)
+    window.addEventListener('scroll', check, { passive: true, capture: true });
+    check(); // run immediately in case already in viewport
+
+    return cleanup;
+  }, []);
+
+  return (
+    <section ref={sectionRef} style={{
+      padding:'56px 0',
+      background:'rgba(9,160,157,.04)',
+      borderTop:'1px solid rgba(9,160,157,.1)',
+      borderBottom:'1px solid rgba(9,160,157,.1)',
+    }}>
+      <div style={{maxWidth:'1240px', width:'calc(100% - 32px)', margin:'0 auto'}}>
+        <div style={{textAlign:'center', marginBottom:'40px'}}>
+          <div style={{display:'inline-flex', alignItems:'center', gap:5, padding:'4px 12px', background:'rgba(9,160,157,.08)', border:'1px solid rgba(9,160,157,.2)', borderRadius:'999px', marginBottom:'14px'}}>
+            <span style={{color:'#09A09D', fontSize:'12px'}}>&#10022;</span>
+            <span style={{fontSize:'10px', fontWeight:600, letterSpacing:'.12em', textTransform:'uppercase', color:'#09A09D', fontFamily:'Geist Mono,monospace'}}>Verified Impact</span>
+          </div>
+        </div>
+        <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', gap:'clamp(32px,6vw,80px)', flexWrap:'wrap'}}>
+          <AnimatedStat num={10}  suffix="x"  label="Faster time to insight"       started={started} delay={0}   />
+          <AnimatedStat num={74}  suffix="%"  label="Fewer ad-hoc data requests"   started={started} delay={180} />
+          <TextStat from="3 days" to="minutes" label="Report turnaround"             started={started} delay={360} />
+          <AnimatedStat num={200} suffix="+" label="Data sources supported"        started={started} delay={540} />
         </div>
       </div>
     </section>
@@ -584,7 +708,7 @@ function Footer() {
               <h4 className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#7878A8] mb-4 whitespace-nowrap">Platform</h4>
               <ul className="flex flex-col gap-2.5">
                 {['AI Chat', 'Integrations', 'Insights Engine', 'Semantic Layer', 'Reports', 'Memory & Storage'].map(link => (
-                  <li key={link}><a href={linkUrls[link] || '#'} className="text-sm text-[#A0A0B8] hover:text-white transition-colors whitespace-nowrap">{link}</a></li>
+                  <li key={link}><a href={linkUrls[link] || '#'} {...(link === 'Video Tutorials' ? {target:'_blank', rel:'noopener noreferrer'} : {})} className="text-sm text-[#A0A0B8] hover:text-white transition-colors whitespace-nowrap">{link}{link === 'Video Tutorials' && <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{width:'10px',height:'10px',marginLeft:'4px',display:'inline',verticalAlign:'middle',opacity:0.5}}><path d="M3.5 2H10V8.5"/><path d="M10 2L2 10"/></svg>}</a></li>
                 ))}
               </ul>
             </div>
@@ -593,7 +717,7 @@ function Footer() {
               <h4 className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#7878A8] mb-4 whitespace-nowrap">Solutions</h4>
               <ul className="flex flex-col gap-2.5">
                 {['For RevOps & BizOps', 'For Founders & CEOs', 'For Marketing Teams', 'For Product Teams', 'For Data & Analytics Teams', 'For Operations & Finance'].map(link => (
-                  <li key={link}><a href={linkUrls[link] || '#'} className="text-sm text-[#A0A0B8] hover:text-white transition-colors whitespace-nowrap">{link}</a></li>
+                  <li key={link}><a href={linkUrls[link] || '#'} {...(link === 'Video Tutorials' ? {target:'_blank', rel:'noopener noreferrer'} : {})} className="text-sm text-[#A0A0B8] hover:text-white transition-colors whitespace-nowrap">{link}{link === 'Video Tutorials' && <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{width:'10px',height:'10px',marginLeft:'4px',display:'inline',verticalAlign:'middle',opacity:0.5}}><path d="M3.5 2H10V8.5"/><path d="M10 2L2 10"/></svg>}</a></li>
                 ))}
               </ul>
             </div>
@@ -601,8 +725,8 @@ function Footer() {
             <div>
               <h4 className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#7878A8] mb-4 whitespace-nowrap">Resources</h4>
               <ul className="flex flex-col gap-2.5">
-                {['Documentation', 'Video Tutorials', 'Blog', 'Contact Support', 'Roadmap', 'AI Connect'].map(link => (
-                  <li key={link}><a href={linkUrls[link] || '#'} className="text-sm text-[#A0A0B8] hover:text-white transition-colors whitespace-nowrap">{link}</a></li>
+                {['Documentation', 'Video Tutorials', 'Blog', 'Support Center', 'Roadmap', 'Community'].map(link => (
+                  <li key={link}><a href={linkUrls[link] || '#'} {...(link === 'Video Tutorials' ? {target:'_blank', rel:'noopener noreferrer'} : {})} className="text-sm text-[#A0A0B8] hover:text-white transition-colors whitespace-nowrap">{link}{link === 'Video Tutorials' && <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{width:'10px',height:'10px',marginLeft:'4px',display:'inline',verticalAlign:'middle',opacity:0.5}}><path d="M3.5 2H10V8.5"/><path d="M10 2L2 10"/></svg>}</a></li>
                 ))}
               </ul>
             </div>
@@ -618,7 +742,7 @@ function Footer() {
                   { label: 'Success Stories', href: 'Success Stories.html' },
                   { label: 'Press & Media', href: 'Press Media.html' },
                 ].map(link => (
-                  <li key={link.label}><a href={link.href} className="text-sm text-[#A0A0B8] hover:text-white transition-colors whitespace-nowrap">{link.label}</a></li>
+                  <li key={link.label}><a href={link.href} {...(link.href.startsWith('http') ? {target:'_blank', rel:'noopener noreferrer'} : {})} className="text-sm text-[#A0A0B8] hover:text-white transition-colors whitespace-nowrap">{link.label}{link.href.startsWith('http') && <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{width:'10px',height:'10px',marginLeft:'4px',display:'inline',verticalAlign:'middle',opacity:0.5}}><path d="M3.5 2H10V8.5"/><path d="M10 2L2 10"/></svg>}</a></li>
                 ))}
               </ul>
             </div>
@@ -626,8 +750,13 @@ function Footer() {
             <div>
               <h4 className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#7878A8] mb-4 whitespace-nowrap">Legal</h4>
               <ul className="flex flex-col gap-2.5">
-                {['Privacy', 'Terms', 'Security', 'Cookie Settings'].map(link => (
-                  <li key={link}><a href="#" className="text-sm text-[#A0A0B8] hover:text-white transition-colors whitespace-nowrap">{link}</a></li>
+                {[
+                  { label: 'Privacy', href: '../Security/Privacy.html' },
+                  { label: 'Terms', href: '../Security/Terms.html' },
+                  { label: 'Security', href: '../Security/Security.html' },
+                  { label: 'Cookie Settings', href: '../Security/Cookie Settings.html' },
+                ].map(link => (
+                  <li key={link.label}><a href={link.href} {...(link.href.startsWith('http') ? {target:'_blank', rel:'noopener noreferrer'} : {})} className="text-sm text-[#A0A0B8] hover:text-white transition-colors whitespace-nowrap">{link.label}{link.href.startsWith('http') && <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{width:'10px',height:'10px',marginLeft:'4px',display:'inline',verticalAlign:'middle',opacity:0.5}}><path d="M3.5 2H10V8.5"/><path d="M10 2L2 10"/></svg>}</a></li>
                 ))}
               </ul>
             </div>
@@ -654,9 +783,8 @@ function App() {
     <div>
       <Header />
       <StoriesHero />
-      <FeaturedStory />
-      <StoryGrid />
       <ResultsBanner />
+      <StoryGrid />
       <BottomCTA />
       <Footer />
     </div>

@@ -103,7 +103,8 @@ section { position: relative; }
   overflow: hidden;
   transition: all .2s;
   text-decoration: none;
-  display: block;
+  display: flex;
+  flex-direction: column;
 }
 .blog-card:hover {
   border-color: rgba(9,160,157,.4);
@@ -192,8 +193,8 @@ function Header() {
     'For Operations & Finance': '../Solutions/Operations Finance.html',
     'Documentation': 'Documentation.html',
     'Blog': 'Blog.html',
-    'Contact Support': 'Contact Support.html',
-    'AI Connect': 'AI Connect.html',
+    'Support Center': 'Contact Support.html',
+    'Community': 'Community.html',
     'Pricing': '../Pricing.html',
     'About Insightis': '../Company/About Insightis.html',
     'Contacts': '../Company/Contacts.html',
@@ -235,13 +236,13 @@ function Header() {
       sections: [
         { heading: 'LEARN', items: [
           { label: 'Documentation', desc: 'Setup guides and API reference', icon: 'file' },
-          { label: 'Video Tutorials', desc: 'Step-by-step walkthroughs', icon: 'play' },
+          { label: 'Video Tutorials', desc: 'Step-by-step walkthroughs', icon: 'play', external: true },
           { label: 'Blog', desc: 'Data analytics tips and product updates', icon: 'rss' },
         ]},
         { heading: 'CONNECT', items: [
-          { label: 'Contact Support', desc: 'Get help from our team', icon: 'support' },
+          { label: 'Support Center', desc: 'Get help from our team', icon: 'support' },
           { label: 'Roadmap', desc: 'Follow product development in real time', icon: 'map' },
-          { label: 'AI Connect', desc: 'Connect your insights to any AI system', icon: 'grid' },
+          { label: 'Community', desc: 'Join our community', icon: 'grid' },
         ]},
       ]
     }
@@ -330,7 +331,7 @@ function Header() {
                     <p className="text-[10px] font-medium uppercase tracking-[0.14em] text-[#A0A0B8] mb-4 px-3">{section.heading}</p>
                     <div className="flex flex-col gap-0.5">
                       {section.items.map((item, ii) => (
-                        <a key={ii} href={linkUrls[item.label] || '#'} onClick={() => setActiveDropdown(null)}
+                        <a key={ii} href={linkUrls[item.label] || '#'} {...(item.external ? {target:'_blank', rel:'noopener noreferrer'} : {})} onClick={() => setActiveDropdown(null)}
                           className="flex items-start gap-3 px-3 py-2.5 rounded-xl hover:bg-white/[0.05] transition-colors group">
                           {item.icon && (
                             <div style={{
@@ -347,7 +348,7 @@ function Header() {
                           )}
                           <div className="flex flex-col">
                             <span className="flex items-center gap-2">
-                              <span className="text-sm font-medium text-white group-hover:text-[#0EC4C1] transition-colors">{item.label}</span>
+                              <span className="text-sm font-medium text-white group-hover:text-[#0EC4C1] transition-colors">{item.label}{item.external && <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{width:'10px',height:'10px',marginLeft:'4px',display:'inline',verticalAlign:'middle',opacity:0.5}}><path d="M3.5 2H10V8.5"/><path d="M10 2L2 10"/></svg>}</span>
                               {item.comingSoon && (
                                 <span style={{fontSize:'10px', fontWeight:500, letterSpacing:'0.04em', padding:'1px 6px', borderRadius:'4px', background:'rgba(10,152,150,0.12)', border:'1px solid rgba(10,152,150,0.3)', color:'#0EC4C1', whiteSpace:'nowrap'}}>Coming Soon</span>
                               )}
@@ -430,7 +431,7 @@ function BlogHero() {
 function FeaturedPost() {
   return (
     <section style={{padding:'0 0 60px'}}>
-      <div style={{maxWidth:'1060px', margin:'0 auto', padding:'0 24px'}}>
+      <div style={{maxWidth:'1280px', margin:'0 auto', padding:'0 24px'}}>
         <div style={{
           position:'relative',
           background:'rgba(255,255,255,.03)',
@@ -462,9 +463,9 @@ function FeaturedPost() {
               </a>
             </div>
 
-            {/* Right: Visual placeholder (40%) */}
-            <div style={{flex:'0 0 40%', minHeight:'280px', display:'flex', alignItems:'center', justifyContent:'center', background:'rgba(9,160,157,.06)', borderLeft:'1px solid rgba(9,160,157,.15)'}}>
-              <InsightisLogoMark size={60} opacity={0.5} />
+            {/* Right: Featured image */}
+            <div style={{flex:'0 0 40%', minHeight:'280px', overflow:'hidden', borderLeft:'1px solid rgba(9,160,157,.15)'}}>
+              <img src="https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&h=560&fit=crop" alt="" style={{width:'100%', height:'100%', objectFit:'cover', display:'block'}} />
             </div>
           </div>
         </div>
@@ -479,7 +480,7 @@ function CategoryFilter({ activeCategory, setActiveCategory }) {
 
   return (
     <section style={{padding:'0 0 40px'}}>
-      <div style={{maxWidth:'1060px', margin:'0 auto', padding:'0 24px'}}>
+      <div style={{maxWidth:'1280px', margin:'0 auto', padding:'0 24px'}}>
         <div style={{display:'flex', justifyContent:'center', gap:'8px', flexWrap:'wrap', overflowX:'auto'}}>
           {categories.map(cat => (
             <button
@@ -498,15 +499,15 @@ function CategoryFilter({ activeCategory, setActiveCategory }) {
 
 /* ── BLOG GRID ── */
 const ARTICLES = [
-  { title: 'Introducing Insights Engine: From Surface Answers to Root Causes', category: 'Product Updates', date: 'Apr 1, 2026', readTime: '6 min', excerpt: 'AI Chat gives you the what. Insights Engine tells you the why. Launching the deep analysis layer for your data ecosystem.' },
-  { title: 'How to Write Better Questions for AI Chat', category: 'Guides & Tutorials', date: 'Mar 28, 2026', readTime: '4 min', excerpt: 'Get more accurate, actionable answers by structuring your queries with context, constraints, and clarity.' },
-  { title: "Why Your MRR Numbers Don't Match (And How to Fix It)", category: 'Data Analytics', date: 'Mar 22, 2026', readTime: '8 min', excerpt: 'The three most common reasons your monthly recurring revenue looks different across tools, and a framework to reconcile them.' },
-  { title: 'What is a Semantic Layer? A Non-Technical Explanation', category: 'Guides & Tutorials', date: 'Mar 15, 2026', readTime: '5 min', excerpt: 'Think of it as a universal translator between your messy data and the clean metrics your team actually needs.' },
-  { title: 'How a Series A SaaS Replaced Looker with Insightis', category: 'Customer Stories', date: 'Mar 10, 2026', readTime: '7 min', excerpt: 'A 40-person team cut their analytics stack cost by 60% and got answers 10x faster. Here is their playbook.' },
-  { title: 'Building the Memory System: How Insightis Learns Your Business', category: 'Engineering', date: 'Mar 5, 2026', readTime: '10 min', excerpt: 'A deep dive into the architecture behind contextual memory, entity resolution, and persistent business knowledge.' },
-  { title: '5 Revenue Metrics Every RevOps Team Should Track Weekly', category: 'Data Analytics', date: 'Feb 28, 2026', readTime: '6 min', excerpt: 'Pipeline velocity, net revenue retention, and three more KPIs that separate guessing from knowing.' },
-  { title: 'New: 50 More Data Source Connectors', category: 'Product Updates', date: 'Feb 20, 2026', readTime: '3 min', excerpt: 'From Notion to NetSuite, we just made it easier to plug in the tools your team already uses every day.' },
-  { title: 'The Future of Business Intelligence is Conversational', category: 'Data Analytics', date: 'Feb 14, 2026', readTime: '9 min', excerpt: 'Dashboards were built for an era of patience. AI chat is built for an era of speed. Here is what changes.' },
+  { title: 'Introducing Insights Engine: From Surface Answers to Root Causes', category: 'Product Updates', date: 'Apr 1, 2026', readTime: '6 min', excerpt: 'AI Chat gives you the what. Insights Engine tells you the why. Launching the deep analysis layer for your data ecosystem.', image: 'https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=600&h=320&fit=crop' },
+  { title: 'How to Write Better Questions for AI Chat', category: 'Guides & Tutorials', date: 'Mar 28, 2026', readTime: '4 min', excerpt: 'Get more accurate, actionable answers by structuring your queries with context, constraints, and clarity.', image: 'https://images.unsplash.com/photo-1677442135703-1787eea5ce01?w=600&h=320&fit=crop' },
+  { title: "Why Your MRR Numbers Don't Match (And How to Fix It)", category: 'Data Analytics', date: 'Mar 22, 2026', readTime: '8 min', excerpt: 'The three most common reasons your monthly recurring revenue looks different across tools, and a framework to reconcile them.', image: 'https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=600&h=320&fit=crop' },
+  { title: 'What is a Semantic Layer? A Non-Technical Explanation', category: 'Guides & Tutorials', date: 'Mar 15, 2026', readTime: '5 min', excerpt: 'Think of it as a universal translator between your messy data and the clean metrics your team actually needs.', image: 'https://images.unsplash.com/photo-1558494949-ef010cbdcc31?w=600&h=320&fit=crop' },
+  { title: 'How a Series A SaaS Replaced Looker with Insightis', category: 'Customer Stories', date: 'Mar 10, 2026', readTime: '7 min', excerpt: 'A 40-person team cut their analytics stack cost by 60% and got answers 10x faster. Here is their playbook.', image: 'https://images.unsplash.com/photo-1553877522-43269d4ea984?w=600&h=320&fit=crop' },
+  { title: 'Building the Memory System: How Insightis Learns Your Business', category: 'Engineering', date: 'Mar 5, 2026', readTime: '10 min', excerpt: 'A deep dive into the architecture behind contextual memory, entity resolution, and persistent business knowledge.', image: 'https://images.unsplash.com/photo-1518770660439-4636190af475?w=600&h=320&fit=crop' },
+  { title: '5 Revenue Metrics Every RevOps Team Should Track Weekly', category: 'Data Analytics', date: 'Feb 28, 2026', readTime: '6 min', excerpt: 'Pipeline velocity, net revenue retention, and three more KPIs that separate guessing from knowing.', image: 'https://images.unsplash.com/photo-1611974789855-9c2a0a7236a3?w=600&h=320&fit=crop' },
+  { title: 'New: 50 More Data Source Connectors', category: 'Product Updates', date: 'Feb 20, 2026', readTime: '3 min', excerpt: 'From Notion to NetSuite, we just made it easier to plug in the tools your team already uses every day.', image: 'https://images.unsplash.com/photo-1558655146-9f40138edfeb?w=600&h=320&fit=crop' },
+  { title: 'The Future of Business Intelligence is Conversational', category: 'Data Analytics', date: 'Feb 14, 2026', readTime: '9 min', excerpt: 'Dashboards were built for an era of patience. AI chat is built for an era of speed. Here is what changes.', image: 'https://images.unsplash.com/photo-1535378917042-10a22c95931a?w=600&h=320&fit=crop' },
 ];
 
 function BlogGrid({ activeCategory }) {
@@ -516,16 +517,16 @@ function BlogGrid({ activeCategory }) {
 
   return (
     <section style={{padding:'0 0 20px'}}>
-      <div style={{maxWidth:'1060px', margin:'0 auto', padding:'0 24px'}}>
+      <div style={{maxWidth:'1280px', margin:'0 auto', padding:'0 24px'}}>
         <div className="blog-grid">
           {filtered.map((article, i) => (
             <a href="#" key={article.title} className="blog-card blog-fade-in" style={{animationDelay:`${i * 0.05}s`}}>
-              {/* Image placeholder */}
-              <div style={{height:'160px', background:'rgba(255,255,255,.03)', display:'flex', alignItems:'center', justifyContent:'center', borderBottom:'1px solid rgba(255,255,255,.04)'}}>
-                <InsightisLogoMark size={36} opacity={0.15} />
+              {/* Article image */}
+              <div style={{height:'160px', background:'rgba(255,255,255,.03)', borderBottom:'1px solid rgba(255,255,255,.04)', overflow:'hidden'}}>
+                <img src={article.image} alt="" style={{width:'100%', height:'100%', objectFit:'cover', display:'block'}} />
               </div>
               {/* Content */}
-              <div style={{padding:'20px'}}>
+              <div style={{padding:'20px', display:'flex', flexDirection:'column', flex:1}}>
                 <div style={{marginBottom:'10px'}}>
                   <span style={{fontSize:'10px', padding:'3px 8px', borderRadius:'999px', background:'rgba(9,160,157,.1)', border:'1px solid rgba(9,160,157,.25)', color:'#0EC4C1', fontWeight:500, letterSpacing:'0.04em'}}>{article.category}</span>
                 </div>
@@ -535,7 +536,7 @@ function BlogGrid({ activeCategory }) {
                 <p style={{fontSize:'13px', color:'#7FA0AC', lineHeight:1.5, marginBottom:'12px', overflow:'hidden', display:'-webkit-box', WebkitLineClamp:2, WebkitBoxOrient:'vertical'}}>
                   {article.excerpt}
                 </p>
-                <div style={{fontSize:'11px', color:'#6E8D9A', fontFamily:"'Geist Mono', monospace"}}>
+                <div style={{fontSize:'11px', color:'#6E8D9A', fontFamily:"'Geist Mono', monospace", marginTop:'auto'}}>
                   {article.date} &middot; {article.readTime} read
                 </div>
               </div>
@@ -657,17 +658,17 @@ function Footer() {
     'For Operations & Finance': '../Solutions/Operations Finance.html',
     'Documentation': 'Documentation.html',
     'Blog': 'Blog.html',
-    'Contact Support': 'Contact Support.html',
-    'AI Connect': 'AI Connect.html',
+    'Support Center': 'Contact Support.html',
+    'Community': 'Community.html',
   };
 
   const resourceLinkUrls = {
     'Documentation': 'Documentation.html',
     'Video Tutorials': '#',
     'Blog': 'Blog.html',
-    'Contact Support': 'Contact Support.html',
+    'Support Center': 'Contact Support.html',
     'Roadmap': '#',
-    'AI Connect': 'AI Connect.html',
+    'Community': 'Community.html',
   };
 
   return (
@@ -691,7 +692,7 @@ function Footer() {
               <h4 className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#7878A8] mb-4 whitespace-nowrap">Platform</h4>
               <ul className="flex flex-col gap-2.5">
                 {['AI Chat', 'Integrations', 'Insights Engine', 'Semantic Layer', 'Reports', 'Memory & Storage'].map(link => (
-                  <li key={link}><a href={linkUrls[link] || '#'} className="text-sm text-[#A0A0B8] hover:text-white transition-colors whitespace-nowrap">{link}</a></li>
+                  <li key={link}><a href={linkUrls[link] || '#'} {...(link === 'Video Tutorials' ? {target:'_blank', rel:'noopener noreferrer'} : {})} className="text-sm text-[#A0A0B8] hover:text-white transition-colors whitespace-nowrap">{link}{link === 'Video Tutorials' && <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{width:'10px',height:'10px',marginLeft:'4px',display:'inline',verticalAlign:'middle',opacity:0.5}}><path d="M3.5 2H10V8.5"/><path d="M10 2L2 10"/></svg>}</a></li>
                 ))}
               </ul>
             </div>
@@ -701,7 +702,7 @@ function Footer() {
               <h4 className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#7878A8] mb-4 whitespace-nowrap">Solutions</h4>
               <ul className="flex flex-col gap-2.5">
                 {['For RevOps & BizOps', 'For Founders & CEOs', 'For Marketing Teams', 'For Product Teams', 'For Data & Analytics Teams', 'For Operations & Finance'].map(link => (
-                  <li key={link}><a href={linkUrls[link] || '#'} className="text-sm text-[#A0A0B8] hover:text-white transition-colors whitespace-nowrap">{link}</a></li>
+                  <li key={link}><a href={linkUrls[link] || '#'} {...(link === 'Video Tutorials' ? {target:'_blank', rel:'noopener noreferrer'} : {})} className="text-sm text-[#A0A0B8] hover:text-white transition-colors whitespace-nowrap">{link}{link === 'Video Tutorials' && <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{width:'10px',height:'10px',marginLeft:'4px',display:'inline',verticalAlign:'middle',opacity:0.5}}><path d="M3.5 2H10V8.5"/><path d="M10 2L2 10"/></svg>}</a></li>
                 ))}
               </ul>
             </div>
@@ -710,7 +711,7 @@ function Footer() {
             <div>
               <h4 className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#7878A8] mb-4 whitespace-nowrap">Resources</h4>
               <ul className="flex flex-col gap-2.5">
-                {['Documentation', 'Video Tutorials', 'Blog', 'Contact Support', 'Roadmap', 'AI Connect'].map(link => (
+                {['Documentation', 'Video Tutorials', 'Blog', 'Support Center', 'Roadmap', 'Community'].map(link => (
                   <li key={link}><a href={resourceLinkUrls[link] || '#'} className="text-sm text-[#A0A0B8] hover:text-white transition-colors whitespace-nowrap">{link}</a></li>
                 ))}
               </ul>
@@ -728,7 +729,7 @@ function Footer() {
                   { label: 'Success Stories', href: '../Company/Success Stories.html' },
                   { label: 'Press & Media', href: '../Company/Press Media.html' },
                 ].map(link => (
-                  <li key={link.label}><a href={link.href} className="text-sm text-[#A0A0B8] hover:text-white transition-colors whitespace-nowrap">{link.label}</a></li>
+                  <li key={link.label}><a href={link.href} {...(link.href.startsWith('http') ? {target:'_blank', rel:'noopener noreferrer'} : {})} className="text-sm text-[#A0A0B8] hover:text-white transition-colors whitespace-nowrap">{link.label}{link.href.startsWith('http') && <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{width:'10px',height:'10px',marginLeft:'4px',display:'inline',verticalAlign:'middle',opacity:0.5}}><path d="M3.5 2H10V8.5"/><path d="M10 2L2 10"/></svg>}</a></li>
                 ))}
               </ul>
             </div>
@@ -737,8 +738,13 @@ function Footer() {
             <div>
               <h4 className="text-[11px] font-medium uppercase tracking-[0.12em] text-[#7878A8] mb-4 whitespace-nowrap">Legal</h4>
               <ul className="flex flex-col gap-2.5">
-                {['Privacy', 'Terms', 'Security', 'Cookie Settings'].map(link => (
-                  <li key={link}><a href="#" className="text-sm text-[#A0A0B8] hover:text-white transition-colors whitespace-nowrap">{link}</a></li>
+                {[
+                  { label: 'Privacy', href: '../Security/Privacy.html' },
+                  { label: 'Terms', href: '../Security/Terms.html' },
+                  { label: 'Security', href: '../Security/Security.html' },
+                  { label: 'Cookie Settings', href: '../Security/Cookie Settings.html' },
+                ].map(link => (
+                  <li key={link.label}><a href={link.href} {...(link.href.startsWith('http') ? {target:'_blank', rel:'noopener noreferrer'} : {})} className="text-sm text-[#A0A0B8] hover:text-white transition-colors whitespace-nowrap">{link.label}{link.href.startsWith('http') && <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 12 12" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" style={{width:'10px',height:'10px',marginLeft:'4px',display:'inline',verticalAlign:'middle',opacity:0.5}}><path d="M3.5 2H10V8.5"/><path d="M10 2L2 10"/></svg>}</a></li>
                 ))}
               </ul>
             </div>
